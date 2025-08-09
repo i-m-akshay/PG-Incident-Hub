@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* A light gray background */
+            background-color: #f3f4f6;
         }
         .incident-card {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -23,7 +23,7 @@
             transition: background-color 0.3s ease;
         }
         .email-button:hover {
-            background-color: #ef4444; /* A slightly darker red */
+            background-color: #ef4444;
         }
         .search-icon {
             filter: grayscale(100%);
@@ -31,6 +31,30 @@
         }
         .search-icon:hover {
             filter: grayscale(0%);
+        }
+        .category-card-button {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+        .category-card-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        .caret-icon {
+            transition: transform 0.3s ease;
+        }
+        .caret-icon.rotate {
+            transform: rotate(90deg);
+        }
+        /* New styles for highlighting and fading */
+        .faded-category {
+            opacity: 0.5;
+        }
+        .highlighted-category {
+            background-color: #e2e8f0; /* A light blue-gray */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            border: 2px solid #3b82f6;
         }
     </style>
 </head>
@@ -53,8 +77,8 @@
         </div>
 
         <!-- Incidents container -->
-        <div id="incidentsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Incident cards will be dynamically generated here by JavaScript -->
+        <div id="incidentsContainer" class="space-y-8">
+            <!-- All content will be dynamically generated here by JavaScript -->
         </div>
     </div>
 
@@ -64,86 +88,121 @@
     </div>
 
     <script>
-        // Data for all incidents. This array can be easily updated with new incidents.
+        // === START OF EDITABLE SECTION ===
+        // This is the array of all incidents, now structured with categories.
         const incidentsData = [
             {
-                id: 'upselling-1',
-                category: 'Upselling',
-                title: 'Parent Concern about Upsell',
-                description: 'A parent raises a concern regarding upselling, expressing issues with curriculum or the student\'s tier. This may also involve a parent meeting.',
-                to: 'PM, SPM',
-                cc: 'Lead, Anurag, Roshan',
-                draftMessage: `Hi Team,
+                category: 'Upsell',
+                incidents: [
+                    {
+                        id: 'upsell-tier-completion',
+                        title: 'Tier Completion (after session 47)',
+                        description: 'When your batch is about to complete TIER (at session number 47)',
+                        to: 'LTV Counsellor',
+                        cc: 'LTV alias, Lead , preeti, akansha negi, PM, Roshan',
+                        draftMessage: `Hi [LTV counselor name],
 
-I hope this email finds you well.
-
-I am writing to report an incident regarding an upselling concern with a parent. The parent's concerns are as follows: [Describe parent's specific concerns here].
-
-We have a parent meeting scheduled for [Date & Time], and I will be discussing the matter with the parent. I will provide an update after the meeting.
-
-Please let me know if you have any suggestions or require further information.
+The [batch ID] batch requires an upsell. There are a total of [no. of students] students in this batch.
+Currently, they are in [Tier, Stage, Session]. Please do the needful and let me know if you need any other information.
 
 Best regards,
-[PG's Name]
-`
+[PG's Name]`
+                    },
+                    {
+                        id: 'upsell-parent-concern',
+                        title: 'Parents\' concern after upsell',
+                        description: 'Parent expresses that the child is upsold in the wrong tier, has problems with the curriculum and syllabus. Expectation of the parents is not met in the upsold tier (might come up mid-tier as well), or in case of evaluation',
+                        to: 'PM, SPM',
+                        cc: 'Lead, Anurag, Roshan',
+                        draftMessage: `Hi [PM/SPM name],
+
+The parent of the student [customer ID] [student name] in the batch [batch ID] joined the recent session to inform that [concern in brief with all the important details mentioned by the parent].
+
+Please look into this.
+
+Best regards,
+[PG's Name]`
+                    },
+                    {
+                        id: 'upsell-absent-1-2',
+                        title: 'Absenteeism in upsell batch (sessions 1-2)',
+                        description: 'The student did not join for the first two sessions.',
+                        to: 'Counsellor',
+                        cc: 'Lead, ltv, PM, Roshan',
+                        draftMessage: `Hi [counselor name],
+
+This is to inform you that student [student ID] [student name] has been absent for 2 consecutive sessions (Sessions 1 and 2) of Tier [Tier, stage].
+Can you please look into this and take the necessary steps?
+Batch Name: [batch ID]
+Student: [student name] [student ID]
+
+Best regards,
+[PG's Name]`
+                    },
+                    {
+                        id: 'upsell-absent-1-4',
+                        title: 'Absenteeism in upsell batch (sessions 1-4)',
+                        description: 'The student did not join for the first four sessions. NOTE: SPM to ask ushma to mark as course completed and inform LTV',
+                        to: 'PM/SPM',
+                        cc: 'Lead, ltv, PM, Roshan',
+                        draftMessage: `Hi [PM/SPM name],
+
+This is to inform you that student [student ID] [student name] has been absent for 4 consecutive sessions (Sessions 1 to 4) of Tier [Tier, stage].
+Can you please look into this and take the necessary steps?
+Batch Name: [batch ID]
+Student: [student name] [student ID]
+
+Best regards,
+[PG's Name]`
+                    }
+                ]
             },
             {
-                id: 'upselling-2',
-                category: 'Upselling',
-                title: 'Absenteeism (1-2 Sessions)',
-                description: 'A student in an upselling batch has missed the first one or two sessions.',
-                to: 'Counsellor',
-                cc: 'Lead, ltv, PM, Roshan',
-                draftMessage: `Hi Team,
+                category: 'Pause related',
+                incidents: [
+                    {
+                        id: 'pause-related-parent-informed',
+                        title: 'Parent informed',
+                        description: 'Parents informed in the class that the child will be going on a pause. NOTE: PG should get the info whenever a student joins back after a pause. PG to confirm from the student about the kit (PG to get trained on how to apply for pause on LMS)',
+                        to: 'jyoti/akash chaudhary',
+                        cc: 'Lead, cc-team@moonpreneur.com',
+                        draftMessage: `Hi [Jyoti/Akash],
 
-I am writing to bring to your attention that [Student's Name] from batch [Batch Number] has missed the first two sessions. The parent has not yet provided any reason for the absence.
-
-Please let me know how you would like me to proceed.
-
-Best regards,
-[PG's Name]
-`
-            },
-            {
-                id: 'upselling-3',
-                category: 'Upselling',
-                title: 'Absenteeism (4+ Sessions)',
-                description: 'A student in an upselling batch has missed 4 or more consecutive sessions.',
-                to: 'SPM, PM',
-                cc: 'Lead, ltv, Roshan',
-                draftMessage: `Hi Team,
-
-I am writing to report that [Student's Name] from batch [Batch Number] has missed [Number of sessions] consecutive sessions without any prior intimation. I have been unable to reach the parent.
-
-Please advise on the next steps.
+The parent of the student [customer ID] [student name] in the batch [batch ID] joined the recent session and informed that [mention the reason] [Date from: To]. Please confirm with the parent again and mark the student as paused.
 
 Best regards,
-[PG's Name]
-`
-            },
-            {
-                id: 'pause-related-1',
-                category: 'Pause Related',
-                title: 'Student Pause',
-                description: 'A student will be going on a break from their sessions. Parents need to be informed on the correct procedure.',
-                to: 'Jyoti/Akash Chaudhary',
-                cc: 'Lead, cc:team@moonpreneur.com',
-                draftMessage: `Hi Team,
-
-I am writing to inform you that [Student's Name] from batch [Batch Number] will be pausing their sessions from [Start Date] to [End Date] for the following reason: [Reason for Pause].
-
-I have informed the parents about the correct pause procedure. Please let me know if any further action is required from my end.
-
-Best regards,
-[PG's Name]
-`
+[PG's Name]`
+                    }
+                ]
             }
         ];
+        // === END OF EDITABLE SECTION ===
 
         const incidentsContainer = document.getElementById('incidentsContainer');
         const incidentSearch = document.getElementById('incidentSearch');
         const messageBox = document.getElementById('messageBox');
 
+        /**
+         * Function to create a collapsed category card.
+         * @param {Object} categoryData - The category data object.
+         * @returns {HTMLElement} The created category card button element.
+         */
+        const createCategoryCardButton = (categoryData) => {
+            const cardButton = document.createElement('div');
+            cardButton.classList.add('category-card-button', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'flex', 'items-center', 'justify-between');
+            cardButton.setAttribute('data-category', categoryData.category.toLowerCase().replace(' ', '-'));
+            cardButton.innerHTML = `
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-gray-800">${categoryData.category}</h2>
+                    <ul class="text-gray-600 text-sm mt-2 space-y-1">
+                        ${categoryData.incidents.map(inc => `<li>${inc.title}</li>`).join('')}
+                    </ul>
+                </div>
+                <svg class="caret-icon w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            `;
+            return cardButton;
+        };
+        
         /**
          * Function to create an incident card element.
          * @param {Object} incident - The incident data object.
@@ -152,17 +211,18 @@ Best regards,
         const createIncidentCard = (incident) => {
             const card = document.createElement('div');
             card.classList.add('incident-card', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'border-t-4', 'border-red-500');
-            card.setAttribute('data-search-terms', `${incident.title} ${incident.description} ${incident.category} ${incident.to} ${incident.cc}`.toLowerCase());
+            card.setAttribute('data-search-terms', `${incident.title} ${incident.description} ${incident.to} ${incident.cc}`.toLowerCase());
+            card.setAttribute('data-incident-id', incident.id);
 
             card.innerHTML = `
                 <h3 class="text-2xl font-bold text-gray-800 mb-2">${incident.title}</h3>
                 <p class="text-gray-600 mb-4">${incident.description}</p>
-                
+
                 <div class="bg-gray-100 p-4 rounded-lg mb-4">
                     <p class="font-semibold text-gray-700 mb-2">To: <span class="font-normal text-gray-600">${incident.to}</span></p>
                     <p class="font-semibold text-gray-700">CC: <span class="font-normal text-gray-600">${incident.cc}</span></p>
                 </div>
-                
+
                 <div class="flex space-x-4">
                     <button class="copy-btn w-full bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
                         Copy Draft Message
@@ -184,14 +244,70 @@ Best regards,
         };
 
         /**
-         * Renders all incident cards to the container.
-         * @param {Array} incidents - An array of incident data objects.
+         * Renders all incident cards to the container, grouped by category.
          */
-        const renderIncidents = (incidents) => {
+        const renderIncidents = () => {
             incidentsContainer.innerHTML = '';
-            incidents.forEach(incident => {
-                const card = createIncidentCard(incident);
-                incidentsContainer.appendChild(card);
+            
+            // Container for category card buttons to be in a row
+            const categoryButtonsContainer = document.createElement('div');
+            categoryButtonsContainer.id = 'categoryButtonsContainer';
+            categoryButtonsContainer.classList.add('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
+            incidentsContainer.appendChild(categoryButtonsContainer);
+
+            // Container for all expanded incident cards, to be displayed below the category buttons
+            const expandedCardsContainer = document.createElement('div');
+            expandedCardsContainer.id = 'expandedCardsContainer';
+            expandedCardsContainer.classList.add('mt-8');
+            incidentsContainer.appendChild(expandedCardsContainer);
+
+            incidentsData.forEach(categoryData => {
+                // Create the category button and add it to its container
+                const categoryCardButton = createCategoryCardButton(categoryData);
+                categoryButtonsContainer.appendChild(categoryCardButton);
+
+                // Create the hidden container for incident cards for this category
+                const cardsContainer = document.createElement('div');
+                cardsContainer.classList.add('cards-container', 'p-6', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
+                cardsContainer.style.display = 'none';
+                cardsContainer.setAttribute('data-category', categoryData.category.toLowerCase().replace(' ', '-'));
+
+                categoryData.incidents.forEach(incident => {
+                    const card = createIncidentCard(incident);
+                    cardsContainer.appendChild(card);
+                });
+
+                expandedCardsContainer.appendChild(cardsContainer);
+
+                categoryCardButton.addEventListener('click', () => {
+                    const isOpen = cardsContainer.style.display === 'grid';
+                    
+                    // Reset all categories to a default state (close and remove highlights)
+                    document.querySelectorAll('.cards-container').forEach(container => {
+                        container.style.display = 'none';
+                    });
+                    document.querySelectorAll('.caret-icon').forEach(icon => {
+                        icon.classList.remove('rotate');
+                    });
+                    document.querySelectorAll('.category-card-button').forEach(button => {
+                        button.classList.remove('highlighted-category');
+                        button.classList.remove('faded-category');
+                    });
+
+                    // Toggle the clicked category
+                    if (!isOpen) {
+                        cardsContainer.style.display = 'grid';
+                        categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
+                        categoryCardButton.classList.add('highlighted-category');
+
+                        // Fade other categories
+                        document.querySelectorAll('.category-card-button').forEach(button => {
+                            if (button !== categoryCardButton) {
+                                button.classList.add('faded-category');
+                            }
+                        });
+                    }
+                });
             });
         };
 
@@ -206,7 +322,7 @@ Best regards,
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            
+
             messageBox.classList.remove('opacity-0', 'translate-y-full');
             messageBox.classList.add('opacity-100', 'translate-y-0');
             setTimeout(() => {
@@ -231,23 +347,70 @@ Best regards,
         // Event listener for the search input
         incidentSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const cards = incidentsContainer.querySelectorAll('.incident-card');
+            const categoryButtonsContainer = document.getElementById('categoryButtonsContainer');
+            const expandedCardsContainer = document.getElementById('expandedCardsContainer');
+            
+            // Clear both containers to rebuild the view
+            categoryButtonsContainer.innerHTML = '';
+            expandedCardsContainer.innerHTML = '';
 
-            cards.forEach(card => {
-                const searchTerms = card.getAttribute('data-search-terms');
-                if (searchTerms.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+            incidentsData.forEach(categoryData => {
+                const filteredIncidents = categoryData.incidents.filter(incident => 
+                    `${incident.title} ${incident.description} ${incident.to} ${incident.cc}`.toLowerCase().includes(searchTerm)
+                );
+                
+                if (filteredIncidents.length > 0 || searchTerm === '') {
+                    // Create and append category button
+                    const categoryCardButton = createCategoryCardButton(categoryData);
+                    categoryButtonsContainer.appendChild(categoryCardButton);
+
+                    // Create and append the cards container for filtered incidents
+                    const cardsContainer = document.createElement('div');
+                    cardsContainer.classList.add('cards-container', 'p-6', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
+                    cardsContainer.style.display = 'none';
+                    cardsContainer.setAttribute('data-category', categoryData.category.toLowerCase().replace(' ', '-'));
+
+                    filteredIncidents.forEach(incident => {
+                        const card = createIncidentCard(incident);
+                        cardsContainer.appendChild(card);
+                    });
+                    expandedCardsContainer.appendChild(cardsContainer);
+                    
+                    if (searchTerm !== '') {
+                        cardsContainer.style.display = 'grid';
+                        categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
+                    }
+                    
+                    // Add the event listener for the button
+                    categoryCardButton.addEventListener('click', () => {
+                        const isOpen = cardsContainer.style.display === 'grid';
+                        
+                        document.querySelectorAll('.cards-container').forEach(container => {
+                            container.style.display = 'none';
+                        });
+                        document.querySelectorAll('.caret-icon').forEach(icon => {
+                            icon.classList.remove('rotate');
+                        });
+
+                        if (!isOpen) {
+                            cardsContainer.style.display = 'grid';
+                            categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
+                        }
+                    });
                 }
             });
+            
+            if (searchTerm !== '') {
+                expandedCardsContainer.classList.remove('mt-8');
+            } else {
+                expandedCardsContainer.classList.add('mt-8');
+            }
         });
 
         // Initial render of all incidents on page load
         document.addEventListener('DOMContentLoaded', () => {
-            renderIncidents(incidentsData);
+            renderIncidents();
         });
     </script>
 </body>
 </html>
-
