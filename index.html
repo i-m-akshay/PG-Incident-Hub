@@ -10,35 +10,62 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #2d3748;
         }
         .incident-card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border-left: 6px solid;
         }
         .incident-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
         }
         .email-button {
-            transition: background-color 0.3s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
         }
         .email-button:hover {
-            background-color: #ef4444;
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .copy-btn {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+        }
+        .copy-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         .search-icon {
             filter: grayscale(100%);
-            transition: filter 0.2s;
+            transition: filter 0.2s, color 0.2s;
         }
         .search-icon:hover {
             filter: grayscale(0%);
+            color: #3b82f6;
         }
         .category-card-button {
             cursor: pointer;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s ease-in-out, background-color 0.3s ease-in-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid;
         }
         .category-card-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+            }
+            50% {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+            }
         }
         .caret-icon {
             transition: transform 0.3s ease;
@@ -48,14 +75,18 @@
         }
         /* New styles for highlighting and fading */
         .faded-category {
-            opacity: 0.5;
+            opacity: 0.6;
         }
         .highlighted-category {
-            background-color: #e2e8f0; /* A light blue-gray */
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
             border: 2px solid #3b82f6;
+            animation: none;
         }
+        .highlighted-category:hover {
+             transform: translateY(-5px); /* Maintain the lift */
+        }
+        
     </style>
 </head>
 <body class="p-6">
@@ -93,13 +124,16 @@
         const incidentsData = [
             {
                 category: 'Upsell',
+                borderColor: '#48BB78', // Green
                 incidents: [
                     {
                         id: 'upsell-tier-completion',
                         title: 'Tier Completion (after session 47)',
                         description: 'When your batch is about to complete TIER (at session number 47)',
                         to: 'LTV Counsellor',
+                        toEmails: 'ltvcounselor@example.com',
                         cc: 'LTV alias, Lead , preeti, akansha negi, PM, Roshan',
+                        ccEmails: 'ltvalias@example.com,lead@example.com,preeti@example.com,akansha.negi@example.com,pm@example.com,roshan@example.com',
                         draftMessage: `Hi [LTV counselor name],
 
 The [batch ID] batch requires an upsell. There are a total of [no. of students] students in this batch.
@@ -113,7 +147,9 @@ Best regards,
                         title: 'Parents\' concern after upsell',
                         description: 'Parent expresses that the child is upsold in the wrong tier, has problems with the curriculum and syllabus. Expectation of the parents is not met in the upsold tier (might come up mid-tier as well), or in case of evaluation',
                         to: 'PM, SPM',
+                        toEmails: 'pm@example.com,spm@example.com',
                         cc: 'Lead, Anurag, Roshan',
+                        ccEmails: 'lead@example.com,anurag@example.com,roshan@example.com',
                         draftMessage: `Hi [PM/SPM name],
 
 The parent of the student [customer ID] [student name] in the batch [batch ID] joined the recent session to inform that [concern in brief with all the important details mentioned by the parent].
@@ -128,7 +164,9 @@ Best regards,
                         title: 'Absenteeism in upsell batch (sessions 1-2)',
                         description: 'The student did not join for the first two sessions.',
                         to: 'Counsellor',
+                        toEmails: 'counsellor@example.com',
                         cc: 'Lead, ltv, PM, Roshan',
+                        ccEmails: 'lead@example.com,ltv@example.com,pm@example.com,roshan@example.com',
                         draftMessage: `Hi [counselor name],
 
 This is to inform you that student [student ID] [student name] has been absent for 2 consecutive sessions (Sessions 1 and 2) of Tier [Tier, stage].
@@ -144,7 +182,9 @@ Best regards,
                         title: 'Absenteeism in upsell batch (sessions 1-4)',
                         description: 'The student did not join for the first four sessions. NOTE: SPM to ask ushma to mark as course completed and inform LTV',
                         to: 'PM/SPM',
+                        toEmails: 'pm@example.com,spm@example.com',
                         cc: 'Lead, ltv, PM, Roshan',
+                        ccEmails: 'lead@example.com,ltv@example.com,pm@example.com,roshan@example.com',
                         draftMessage: `Hi [PM/SPM name],
 
 This is to inform you that student [student ID] [student name] has been absent for 4 consecutive sessions (Sessions 1 to 4) of Tier [Tier, stage].
@@ -159,13 +199,16 @@ Best regards,
             },
             {
                 category: 'Pause related',
+                borderColor: '#F87171', // Red
                 incidents: [
                     {
                         id: 'pause-related-parent-informed',
                         title: 'Parent informed',
                         description: 'Parents informed in the class that the child will be going on a pause. NOTE: PG should get the info whenever a student joins back after a pause. PG to confirm from the student about the kit (PG to get trained on how to apply for pause on LMS)',
                         to: 'jyoti/akash chaudhary',
+                        toEmails: 'jyoti@example.com,akashchaudhary@example.com',
                         cc: 'Lead, cc-team@moonpreneur.com',
+                        ccEmails: 'lead@example.com,ccteam@moonpreneur.com',
                         draftMessage: `Hi [Jyoti/Akash],
 
 The parent of the student [customer ID] [student name] in the batch [batch ID] joined the recent session and informed that [mention the reason] [Date from: To]. Please confirm with the parent again and mark the student as paused.
@@ -177,10 +220,43 @@ Best regards,
             }
         ];
         // === END OF EDITABLE SECTION ===
-
+        
         const incidentsContainer = document.getElementById('incidentsContainer');
         const incidentSearch = document.getElementById('incidentSearch');
         const messageBox = document.getElementById('messageBox');
+        let currentExpandedCategory = null;
+
+        /**
+         * Copies text to the clipboard and shows a confirmation message.
+         * @param {string} text - The text to copy.
+         */
+        const copyToClipboard = (text) => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            messageBox.classList.remove('opacity-0', 'translate-y-full');
+            messageBox.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                messageBox.classList.remove('opacity-100', 'translate-y-0');
+                messageBox.classList.add('opacity-0', 'translate-y-full');
+            }, 2500);
+        };
+
+        /**
+         * Composes a new Gmail email with pre-filled fields.
+         * @param {string} to - The 'To' recipient(s).
+         * @param {string} cc - The 'CC' recipient(s).
+         * @param {string} subject - The email subject.
+         * @param {string} body - The email body text.
+         */
+        const composeEmail = (to, cc, subject, body) => {
+            const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&cc=${encodeURIComponent(cc)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink, '_blank');
+        };
 
         /**
          * Function to create a collapsed category card.
@@ -190,10 +266,11 @@ Best regards,
         const createCategoryCardButton = (categoryData) => {
             const cardButton = document.createElement('div');
             cardButton.classList.add('category-card-button', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'flex', 'items-center', 'justify-between');
+            cardButton.style.borderColor = categoryData.borderColor;
             cardButton.setAttribute('data-category', categoryData.category.toLowerCase().replace(' ', '-'));
             cardButton.innerHTML = `
                 <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-800">${categoryData.category}</h2>
+                    <h2 class="text-2xl font-bold">${categoryData.category}</h2>
                     <ul class="text-gray-600 text-sm mt-2 space-y-1">
                         ${categoryData.incidents.map(inc => `<li>${inc.title}</li>`).join('')}
                     </ul>
@@ -208,12 +285,17 @@ Best regards,
          * @param {Object} incident - The incident data object.
          * @returns {HTMLElement} The created card element.
          */
-        const createIncidentCard = (incident) => {
+        const createIncidentCard = (incident, categoryBorderColor) => {
             const card = document.createElement('div');
-            card.classList.add('incident-card', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'border-t-4', 'border-red-500');
+            card.classList.add('incident-card', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg');
             card.setAttribute('data-search-terms', `${incident.title} ${incident.description} ${incident.to} ${incident.cc}`.toLowerCase());
             card.setAttribute('data-incident-id', incident.id);
-
+            
+            // Set the border color based on the category's `borderColor` property
+            if (categoryBorderColor) {
+                card.style.borderLeftColor = categoryBorderColor;
+            }
+            
             card.innerHTML = `
                 <h3 class="text-2xl font-bold text-gray-800 mb-2">${incident.title}</h3>
                 <p class="text-gray-600 mb-4">${incident.description}</p>
@@ -224,10 +306,10 @@ Best regards,
                 </div>
 
                 <div class="flex space-x-4">
-                    <button class="copy-btn w-full bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
+                    <button class="copy-btn w-full text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:scale-105 transition-all bg-blue-500 hover:bg-blue-600">
                         Copy Draft Message
                     </button>
-                    <button class="email-btn w-full bg-red-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-red-600 transition-colors">
+                    <button class="email-btn w-full text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:scale-105 transition-all bg-red-500 hover:bg-red-600">
                         Compose Email
                     </button>
                 </div>
@@ -236,9 +318,12 @@ Best regards,
             // Get the buttons and add event listeners
             const copyButton = card.querySelector('.copy-btn');
             const emailButton = card.querySelector('.email-btn');
+            
+            // Build the subject line with a placeholder
+            const subjectLine = `${incident.title}: [batch ID]`;
 
             copyButton.addEventListener('click', () => copyToClipboard(incident.draftMessage));
-            emailButton.addEventListener('click', () => composeEmail(incident.to, incident.cc, incident.draftMessage));
+            emailButton.addEventListener('click', () => composeEmail(incident.toEmails, incident.ccEmails, subjectLine, incident.draftMessage));
 
             return card;
         };
@@ -273,7 +358,7 @@ Best regards,
                 cardsContainer.setAttribute('data-category', categoryData.category.toLowerCase().replace(' ', '-'));
 
                 categoryData.incidents.forEach(incident => {
-                    const card = createIncidentCard(incident);
+                    const card = createIncidentCard(incident, categoryData.borderColor);
                     cardsContainer.appendChild(card);
                 });
 
@@ -282,7 +367,7 @@ Best regards,
                 categoryCardButton.addEventListener('click', () => {
                     const isOpen = cardsContainer.style.display === 'grid';
                     
-                    // Reset all categories to a default state (close and remove highlights)
+                    // Close all other open categories
                     document.querySelectorAll('.cards-container').forEach(container => {
                         container.style.display = 'none';
                     });
@@ -299,6 +384,7 @@ Best regards,
                         cardsContainer.style.display = 'grid';
                         categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
                         categoryCardButton.classList.add('highlighted-category');
+                        categoryCardButton.style.borderColor = categoryData.borderColor;
 
                         // Fade other categories
                         document.querySelectorAll('.category-card-button').forEach(button => {
@@ -306,104 +392,113 @@ Best regards,
                                 button.classList.add('faded-category');
                             }
                         });
+                        currentExpandedCategory = categoryData.category.toLowerCase().replace(' ', '-');
+                    } else {
+                        currentExpandedCategory = null;
                     }
                 });
             });
         };
 
-        /**
-         * Copies text to the clipboard and shows a confirmation message.
-         * @param {string} text - The text to copy.
-         */
-        const copyToClipboard = (text) => {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
+        const handleSearch = (searchTerm) => {
+            const categoryButtons = document.querySelectorAll('.category-card-button');
+            const allCardsContainers = document.querySelectorAll('.cards-container');
+            
+            // If the search term is empty, restore original state
+            if (searchTerm === '') {
+                // Show all category buttons
+                categoryButtons.forEach(button => {
+                    button.style.display = 'flex';
+                    button.classList.remove('faded-category', 'highlighted-category');
+                    button.querySelector('.caret-icon').classList.remove('rotate');
+                });
+                // Close all incident card containers
+                allCardsContainers.forEach(container => container.style.display = 'none');
+                currentExpandedCategory = null;
+                return;
+            }
 
-            messageBox.classList.remove('opacity-0', 'translate-y-full');
-            messageBox.classList.add('opacity-100', 'translate-y-0');
-            setTimeout(() => {
-                messageBox.classList.remove('opacity-100', 'translate-y-0');
-                messageBox.classList.add('opacity-0', 'translate-y-full');
-            }, 2500);
-        };
-
-        /**
-         * Composes a new Gmail email with pre-filled fields.
-         * @param {string} to - The 'To' recipient(s).
-         * @param {string} cc - The 'CC' recipient(s).
-         * @param {string} body - The email body text.
-         */
-        const composeEmail = (to, cc, body) => {
-            // URL-encode the email body and subject
-            const subject = encodeURIComponent(`Incident Report: `);
-            const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&cc=${encodeURIComponent(cc)}&su=${subject}&body=${encodeURIComponent(body)}`;
-            window.open(mailtoLink, '_blank');
+            // If a category is expanded, search only within it
+            if (currentExpandedCategory) {
+                const expandedContainer = document.querySelector(`.cards-container[data-category="${currentExpandedCategory}"]`);
+                if (expandedContainer) {
+                    const cards = expandedContainer.querySelectorAll('.incident-card');
+                    let hasMatch = false;
+                    cards.forEach(card => {
+                        if (card.getAttribute('data-search-terms').includes(searchTerm)) {
+                            card.style.display = 'block';
+                            hasMatch = true;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    // Show the expanded category button and its cards if there's a match
+                    const expandedCategoryButton = document.querySelector(`.category-card-button[data-category="${currentExpandedCategory}"]`);
+                    if (hasMatch) {
+                        expandedCategoryButton.style.display = 'flex';
+                        expandedContainer.style.display = 'grid';
+                        expandedCategoryButton.classList.add('highlighted-category');
+                    } else {
+                        expandedCategoryButton.style.display = 'flex';
+                        expandedContainer.style.display = 'none';
+                        expandedCategoryButton.classList.add('faded-category');
+                    }
+                    // Hide all other category buttons and containers
+                    categoryButtons.forEach(button => {
+                        if (button.getAttribute('data-category') !== currentExpandedCategory) {
+                            button.style.display = 'none';
+                        }
+                    });
+                }
+            } else {
+                // No category is expanded, search all categories
+                let foundMatch = false;
+                categoryButtons.forEach(button => {
+                    const categoryName = button.getAttribute('data-category');
+                    const cardsContainer = document.querySelector(`.cards-container[data-category="${categoryName}"]`);
+                    let hasMatch = false;
+                    
+                    const cards = cardsContainer.querySelectorAll('.incident-card');
+                    cards.forEach(card => {
+                        if (card.getAttribute('data-search-terms').includes(searchTerm)) {
+                            card.style.display = 'block';
+                            hasMatch = true;
+                            foundMatch = true;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    
+                    if (hasMatch) {
+                        button.style.display = 'flex';
+                        cardsContainer.style.display = 'grid';
+                        button.classList.add('highlighted-category');
+                        button.querySelector('.caret-icon').classList.add('rotate');
+                    } else {
+                        button.style.display = 'flex';
+                        cardsContainer.style.display = 'none';
+                        button.classList.remove('highlighted-category');
+                        button.querySelector('.caret-icon').classList.remove('rotate');
+                    }
+                });
+                 // If no match is found anywhere, fade all categories
+                if (!foundMatch && searchTerm !== '') {
+                    categoryButtons.forEach(button => {
+                        button.classList.add('faded-category');
+                    });
+                }
+            }
         };
 
         // Event listener for the search input
         incidentSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const categoryButtonsContainer = document.getElementById('categoryButtonsContainer');
-            const expandedCardsContainer = document.getElementById('expandedCardsContainer');
             
-            // Clear both containers to rebuild the view
-            categoryButtonsContainer.innerHTML = '';
-            expandedCardsContainer.innerHTML = '';
-
-            incidentsData.forEach(categoryData => {
-                const filteredIncidents = categoryData.incidents.filter(incident => 
-                    `${incident.title} ${incident.description} ${incident.to} ${incident.cc}`.toLowerCase().includes(searchTerm)
-                );
-                
-                if (filteredIncidents.length > 0 || searchTerm === '') {
-                    // Create and append category button
-                    const categoryCardButton = createCategoryCardButton(categoryData);
-                    categoryButtonsContainer.appendChild(categoryCardButton);
-
-                    // Create and append the cards container for filtered incidents
-                    const cardsContainer = document.createElement('div');
-                    cardsContainer.classList.add('cards-container', 'p-6', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
-                    cardsContainer.style.display = 'none';
-                    cardsContainer.setAttribute('data-category', categoryData.category.toLowerCase().replace(' ', '-'));
-
-                    filteredIncidents.forEach(incident => {
-                        const card = createIncidentCard(incident);
-                        cardsContainer.appendChild(card);
-                    });
-                    expandedCardsContainer.appendChild(cardsContainer);
-                    
-                    if (searchTerm !== '') {
-                        cardsContainer.style.display = 'grid';
-                        categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
-                    }
-                    
-                    // Add the event listener for the button
-                    categoryCardButton.addEventListener('click', () => {
-                        const isOpen = cardsContainer.style.display === 'grid';
-                        
-                        document.querySelectorAll('.cards-container').forEach(container => {
-                            container.style.display = 'none';
-                        });
-                        document.querySelectorAll('.caret-icon').forEach(icon => {
-                            icon.classList.remove('rotate');
-                        });
-
-                        if (!isOpen) {
-                            cardsContainer.style.display = 'grid';
-                            categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
-                        }
-                    });
-                }
-            });
-            
-            if (searchTerm !== '') {
-                expandedCardsContainer.classList.remove('mt-8');
+            // Re-render based on the search term
+            if (searchTerm === '') {
+                renderIncidents(); // Reset the UI to its initial state
             } else {
-                expandedCardsContainer.classList.add('mt-8');
+                handleSearch(searchTerm);
             }
         });
 
