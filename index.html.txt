@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PG Incident Management</title>
+    <!-- Tailwind CSS CDN for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* A light gray background */
+        }
+        .incident-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .incident-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .email-button {
+            transition: background-color 0.3s ease;
+        }
+        .email-button:hover {
+            background-color: #ef4444; /* A slightly darker red */
+        }
+        .search-icon {
+            filter: grayscale(100%);
+            transition: filter 0.2s;
+        }
+        .search-icon:hover {
+            filter: grayscale(0%);
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header section with title and search bar -->
+        <header class="text-center mb-10">
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">PG Incident Hub</h1>
+            <p class="text-gray-500 text-lg">Your one-stop guide for handling all types of incidents.</p>
+        </header>
+
+        <!-- Search bar -->
+        <div class="mb-10 flex justify-center">
+            <div class="relative w-full max-w-2xl">
+                <input type="text" id="incidentSearch" placeholder="Search for an incident..." class="w-full pl-12 pr-4 py-3 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-md text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Incidents container -->
+        <div id="incidentsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Incident cards will be dynamically generated here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Message box for copy confirmation -->
+    <div id="messageBox" class="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transform translate-y-full transition-all duration-500 z-50">
+        Message copied to clipboard!
+    </div>
+
+    <script>
+        // Data for all incidents. This array can be easily updated with new incidents.
+        const incidentsData = [
+            {
+                id: 'upselling-1',
+                category: 'Upselling',
+                title: 'Parent Concern about Upsell',
+                description: 'A parent raises a concern regarding upselling, expressing issues with curriculum or the student\'s tier. This may also involve a parent meeting.',
+                to: 'PM, SPM',
+                cc: 'Lead, Anurag, Roshan',
+                draftMessage: `Hi Team,
+
+I hope this email finds you well.
+
+I am writing to report an incident regarding an upselling concern with a parent. The parent's concerns are as follows: [Describe parent's specific concerns here].
+
+We have a parent meeting scheduled for [Date & Time], and I will be discussing the matter with the parent. I will provide an update after the meeting.
+
+Please let me know if you have any suggestions or require further information.
+
+Best regards,
+[PG's Name]
+`
+            },
+            {
+                id: 'upselling-2',
+                category: 'Upselling',
+                title: 'Absenteeism (1-2 Sessions)',
+                description: 'A student in an upselling batch has missed the first one or two sessions.',
+                to: 'Counsellor',
+                cc: 'Lead, ltv, PM, Roshan',
+                draftMessage: `Hi Team,
+
+I am writing to bring to your attention that [Student's Name] from batch [Batch Number] has missed the first two sessions. The parent has not yet provided any reason for the absence.
+
+Please let me know how you would like me to proceed.
+
+Best regards,
+[PG's Name]
+`
+            },
+            {
+                id: 'upselling-3',
+                category: 'Upselling',
+                title: 'Absenteeism (4+ Sessions)',
+                description: 'A student in an upselling batch has missed 4 or more consecutive sessions.',
+                to: 'SPM, PM',
+                cc: 'Lead, ltv, Roshan',
+                draftMessage: `Hi Team,
+
+I am writing to report that [Student's Name] from batch [Batch Number] has missed [Number of sessions] consecutive sessions without any prior intimation. I have been unable to reach the parent.
+
+Please advise on the next steps.
+
+Best regards,
+[PG's Name]
+`
+            },
+            {
+                id: 'pause-related-1',
+                category: 'Pause Related',
+                title: 'Student Pause',
+                description: 'A student will be going on a break from their sessions. Parents need to be informed on the correct procedure.',
+                to: 'Jyoti/Akash Chaudhary',
+                cc: 'Lead, cc:team@moonpreneur.com',
+                draftMessage: `Hi Team,
+
+I am writing to inform you that [Student's Name] from batch [Batch Number] will be pausing their sessions from [Start Date] to [End Date] for the following reason: [Reason for Pause].
+
+I have informed the parents about the correct pause procedure. Please let me know if any further action is required from my end.
+
+Best regards,
+[PG's Name]
+`
+            }
+        ];
+
+        const incidentsContainer = document.getElementById('incidentsContainer');
+        const incidentSearch = document.getElementById('incidentSearch');
+        const messageBox = document.getElementById('messageBox');
+
+        /**
+         * Function to create an incident card element.
+         * @param {Object} incident - The incident data object.
+         * @returns {HTMLElement} The created card element.
+         */
+        const createIncidentCard = (incident) => {
+            const card = document.createElement('div');
+            card.classList.add('incident-card', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'border-t-4', 'border-red-500');
+            card.setAttribute('data-search-terms', `${incident.title} ${incident.description} ${incident.category} ${incident.to} ${incident.cc}`.toLowerCase());
+
+            card.innerHTML = `
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">${incident.title}</h3>
+                <p class="text-gray-600 mb-4">${incident.description}</p>
+                
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <p class="font-semibold text-gray-700 mb-2">To: <span class="font-normal text-gray-600">${incident.to}</span></p>
+                    <p class="font-semibold text-gray-700">CC: <span class="font-normal text-gray-600">${incident.cc}</span></p>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button class="copy-btn w-full bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
+                        Copy Draft Message
+                    </button>
+                    <button class="email-btn w-full bg-red-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-red-600 transition-colors">
+                        Compose Email
+                    </button>
+                </div>
+            `;
+
+            // Get the buttons and add event listeners
+            const copyButton = card.querySelector('.copy-btn');
+            const emailButton = card.querySelector('.email-btn');
+
+            copyButton.addEventListener('click', () => copyToClipboard(incident.draftMessage));
+            emailButton.addEventListener('click', () => composeEmail(incident.to, incident.cc, incident.draftMessage));
+
+            return card;
+        };
+
+        /**
+         * Renders all incident cards to the container.
+         * @param {Array} incidents - An array of incident data objects.
+         */
+        const renderIncidents = (incidents) => {
+            incidentsContainer.innerHTML = '';
+            incidents.forEach(incident => {
+                const card = createIncidentCard(incident);
+                incidentsContainer.appendChild(card);
+            });
+        };
+
+        /**
+         * Copies text to the clipboard and shows a confirmation message.
+         * @param {string} text - The text to copy.
+         */
+        const copyToClipboard = (text) => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            messageBox.classList.remove('opacity-0', 'translate-y-full');
+            messageBox.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                messageBox.classList.remove('opacity-100', 'translate-y-0');
+                messageBox.classList.add('opacity-0', 'translate-y-full');
+            }, 2500);
+        };
+
+        /**
+         * Composes a new Gmail email with pre-filled fields.
+         * @param {string} to - The 'To' recipient(s).
+         * @param {string} cc - The 'CC' recipient(s).
+         * @param {string} body - The email body text.
+         */
+        const composeEmail = (to, cc, body) => {
+            // URL-encode the email body and subject
+            const subject = encodeURIComponent(`Incident Report: `);
+            const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&cc=${encodeURIComponent(cc)}&su=${subject}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink, '_blank');
+        };
+
+        // Event listener for the search input
+        incidentSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = incidentsContainer.querySelectorAll('.incident-card');
+
+            cards.forEach(card => {
+                const searchTerms = card.getAttribute('data-search-terms');
+                if (searchTerms.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Initial render of all incidents on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIncidents(incidentsData);
+        });
+    </script>
+</body>
+</html>
