@@ -217,6 +217,342 @@ Best regards,
 [PG's Name]`
                     }
                 ]
+            },
+            {
+                category: 'Student & Parent Issues',
+                borderColor: '#60A5FA', // Light Blue
+                incidents: [
+                    {
+                        id: 'fast-slow-pace',
+                        title: 'Fast/Slow pace',
+                        description: 'When a student is either too fast or too slow in class.',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Anurag, PM, Lead',
+                        ccEmails: 'anurag@example.com,pm@example.com,lead@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+I have a student in my [Batch ID] batch, [Student Name] [Student ID], who is either moving too fast or too slow. [Briefly explain the situation: e.g., "The student is completing all the activities very quickly and is bored," or "The student is unable to keep up with the pace of the class and is getting frustrated."]
+
+Can you please look into this and provide some guidance?
+
+Thanks.`
+                    },
+                    {
+                        id: 'student-behavior-issues',
+                        title: 'Student Behavior Issues',
+                        description: 'If a student does not fit in the batch due to various reasons. Note: SPM to take further action and tag people based on the situation.',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Anurag, PM, Lead',
+                        ccEmails: 'anurag@example.com,pm@example.com,lead@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+This is regarding [Student Name] [Student ID] from batch [Batch ID]. The student is consistently displaying disruptive behavior, such as [describe the behavior in detail, e.g., "using inappropriate language," "refusing to participate," "distracting other students"]. I have tried [mention the steps you have taken, e.g., "speaking with the student privately," "setting clear expectations," "informing the parent in the chat box"].
+
+Can you please intervene and suggest the next steps?
+
+Thanks.`
+                    },
+                    {
+                        id: 'parents-interaction-with-pgs',
+                        title: 'Parents\' Interaction with PGs',
+                        description: 'The customer says something, and the PG should not reply with answers, but instead let them know that a team will get in touch and set up a separate meeting. After the session, the PG should drop an email. Note: SPM to analyze the situation and decide who all are supposed to be tagged further.',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM, Anurag',
+                        ccEmails: 'lead@example.com,pm@example.com,anurag@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+A parent of [Student Name] [Student ID] from my batch [Batch ID] wants to have a discussion with me regarding [briefly state the parent's concern]. I have informed the parent that the team will connect with them.
+
+Please take further action.
+
+Thanks.`
+                    },
+                    {
+                        id: 'parent-requests-ptm',
+                        title: 'If the Parent is asking for PTM',
+                        description: 'When a parent directly requests a Parent-Teacher Meeting. SPM will tag and align a Counselor or Senior team member as per the requirement.',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+A parent from my batch [Batch ID] is asking for a PTM. [Student Name] [Student ID] is facing [mention the parent's concern].
+
+Could you please schedule a meeting with the parent?
+
+Thanks.`
+                    },
+                    {
+                        id: 'parents-direct-email-to-pg',
+                        title: 'If the parents write a direct email to PG',
+                        description: 'If the email is related to assignments or credentials of the platform, the PG can reply directly after a discussion with the lead, while keeping the Lead and PM in CC. Otherwise, the email should be forwarded.',
+                        to: 'PM',
+                        toEmails: 'pm@example.com',
+                        cc: 'Lead, SPM',
+                        ccEmails: 'lead@example.com,spm@example.com',
+                        draftMessage: `Hi [PM Name],
+
+I received an email from a parent of [Student Name] [Student ID] from batch [Batch ID]. They are concerned about [briefly summarize the parent's email]. I have attached the email for your reference.
+
+Please let me know how to proceed.
+
+Thanks.`
+                    },
+                    {
+                        id: 'students-joining-late-ipad-phone-1',
+                        title: 'Students Joining Late with Ipad or Phone (sessions 1-12)',
+                        description: 'For students joining late in the first 12 sessions.',
+                        to: 'Counsellor',
+                        toEmails: 'counsellor@example.com',
+                        cc: 'cc-team alias, PM, SPM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,spm@example.com,lead@example.com',
+                        draftMessage: `Hi [Counsellor Name],
+
+This is regarding [Student Name] [Student ID] from batch [Batch ID]. The student has been joining the sessions using an iPad/Phone and is unable to [mention the specific issue, e.g., "access the LMS," "use the required software"]. I have already informed the parent about this issue.
+
+Could you please follow up with them to resolve this?
+
+Thanks.`
+                    },
+                    {
+                        id: 'students-joining-late-ipad-phone-2',
+                        title: 'Students Joining Late with Ipad or Phone (sessions 13+)',
+                        description: 'For students joining late from the 13th session onwards, or joining with an iPad or Phone.',
+                        to: 'Akash chaudhary/jyoti',
+                        toEmails: 'akashchaudhary@example.com,jyoti@example.com',
+                        cc: 'cc-team alias, PM, SPM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,spm@example.com,lead@example.com',
+                        draftMessage: `Hi [Akash Chaudhary/Jyoti Name],
+
+This is regarding [Student Name] [Student ID] from batch [Batch ID]. The student has been joining the sessions using an iPad/Phone and is unable to [mention the specific issue, e.g., "access the LMS," "use the required software"]. I have already informed the parent about this issue.
+
+Could you please follow up with them to resolve this?
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Kit & Shipment Issues',
+                borderColor: '#F97316', // Orange
+                incidents: [
+                    {
+                        id: 'address-verification',
+                        title: 'Address verification',
+                        description: 'Not receiving OTP, changing address, parents not available in the session for confirmation, all the verification sessions are completed and still the address remains unconfirmed, paused students join the batch and we cannot verify the address due to the verification not being configured. Note: SPM to coordinate with the CC team or ECOM team to get the verification done. Please raise a ticket to vivek.j@moonpreneur.com for external address verification. Collect the address in the class and mention it in the ticket along with the batch ID and kit name (Confirm address tag resets when the batch changes or the wrong status is visible).',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM, chetan',
+                        ccEmails: 'lead@example.com,pm@example.com,chetan@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+Could you please verify the shipping address for [Student Name] [Student ID] in batch [Batch ID]? The address is [provide the full address].
+
+Please let me know if there are any discrepancies.
+
+Thanks.`
+                    },
+                    {
+                        id: 'shipment-issues-entire-kit',
+                        title: 'Shipment Issues (entire kit)',
+                        description: 'The student did not receive the kit, and the unboxing session is approaching or has passed. Note: Ask for the tracking details.',
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon Name],
+
+This is to inform you that the kit for [Student Name] [Student ID] from batch [Batch ID] has not been delivered yet. The student needs the kit by [date].
+
+Could you please look into this urgently and provide an update on the shipment status?
+
+Thanks.`
+                    },
+                    {
+                        id: 'shipment-issues-order-not-placed',
+                        title: 'Shipment Issues (order not placed)',
+                        description: 'The student did not receive the kit, and the unboxing session is approaching or has passed. The ECOM team says that the order is not placed. Note: SPM to initiate the shipment on an urgent basis. PG to collect the address promptly within the session.',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+This is to inform you that the kit for [Student Name] [Student ID] from batch [Batch ID] has not been delivered yet. The ECOM team has stated that the order was not placed. I have collected the address: [provide the full address].
+
+Could you please initiate the shipment on an urgent basis?
+
+Thanks.`
+                    },
+                    {
+                        id: 'kits-held-at-courier-office',
+                        title: 'Kits held at courier office (delays)',
+                        description: 'The tracking link shows Kits held at courier office that is causing delay. Note: We can offer makeup sessions for practical testing of the missed session without a kit. (Only SPM to approve this).',
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon],
+
+The kit for [Student Name] [Student ID] from batch [Batch ID] is being held at the courier office, causing delays.
+
+Could you please look into this and provide an update?
+
+Thanks.`
+                    },
+                    {
+                        id: 'wrong-kit-address-duplicate',
+                        title: 'Wrong kit/address/duplicate kits',
+                        description: 'Wrong kit shipped, kit sent to the wrong address, or duplicate kits. Note: PM/SPM to take action and get the right shipment initiated. Take help from the CC team if needed.',
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon Name],
+
+This is to inform you that [a wrong kit was shipped/the kit was sent to the wrong address/a duplicate kit was received] for [Student Name] [Student ID] from batch [Batch ID].
+
+Could you please take the necessary action to rectify this?
+
+Thanks.`
+                    },
+                    {
+                        id: 'kit-not-delivered-in-batch',
+                        title: 'Kit not delivered in a complete batch',
+                        description: 'None of the students in a batch has received the kit, and the kit unboxing session is approaching. Note: SPM to initiate the delivery and check the fault. Also, enable the revision/buffer session.',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+The kits for my batch [Batch ID] have not been delivered. Could you please initiate the delivery and check the fault? I would also like to request that a revision/buffer session be enabled.
+
+Thanks.`
+                    },
+                    {
+                        id: 'kit-delivered-parent-denies',
+                        title: 'Kit delivered, parent denies',
+                        description: 'The status in the tracking link shows the kit is delivered, but the customer is saying that they have not received any kit. Note: SPM to discuss this with a counselor or CC team, and discuss this with the customer, and investigate the problem with Syed/Vivek.',
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+The tracking shows that the kit for [Student Name] [Student ID] from batch [Batch ID] has been delivered, but the parent has informed me that they have not received it.
+
+Could you please look into this and discuss it with the parent?
+
+Thanks.`
+                    },
+                    {
+                        id: 'parent-requested-shipment-hold',
+                        title: 'Parent requested shipment hold',
+                        description: 'Parents requesting to hold the shipment for some time (travelling).',
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon Name],
+
+A parent from my batch [Batch ID] has requested to hold the shipment of the kit for [Student Name] [Student ID] as they are travelling.
+
+Could you please hold the shipment until [date]?
+
+Thanks.`
+                    },
+                    {
+                        id: 'kit-on-hold-payment-issues',
+                        title: 'Kit on hold due to payment issues',
+                        description: 'Kit is kept on hold due to payment issues like customer has not paid for the enrolled course.',
+                        to: 'Akansha, counsellor',
+                        toEmails: 'akansha@example.com,counsellor@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Akansha/Counsellor Name],
+
+The kit for [Student Name] [Student ID] from batch [Batch ID] is on hold due to a payment issue.
+
+Could you please look into this and get it resolved?
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Kit Component Issues',
+                borderColor: '#FF0000', // Red
+                incidents: [
+                    {
+                        id: 'component-not-working',
+                        title: 'Component not working',
+                        description: 'If any component in the kit is not working, physically damaged, has factory issues, malfunctioning including the microcontroller, our internal boards, off-the-shelf components (LEDS, POT, SENSORS, other modules), or problems related to batteries (RF, IR remote, and car kit batteries). Note: Debugging team to decide on sessions, replacement, or student consultation.',
+                        to: 'Debugging alias',
+                        toEmails: 'debugging@example.com',
+                        cc: 'PM, Lead, SPM',
+                        ccEmails: 'pm@example.com,lead@example.com,spm@example.com',
+                        draftMessage: `Hi Debugging Team,
+
+I'm reporting an issue with the kit for [Student Name] [Student ID] in batch [Batch ID]. The component [name of the component] is either [explain the issue, e.g., "broken," "not working," "incorrect"]. The student is unable to proceed with the session.
+
+Could you please arrange for a replacement?
+
+Thanks.`
+                    },
+                    {
+                        id: 'components-missing-unboxing',
+                        title: 'Components missing during the kit unboxing session',
+                        description: 'Some components are missing from the kit during the unboxing session. Note: PM/SPM to verify and approve the shipment of missing components.',
+                        to: 'syed, vivek',
+                        toEmails: 'syed@example.com,vivek@example.com',
+                        cc: 'SPM, PM, Lead, Saurabh',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,saurabh@example.com',
+                        draftMessage: `Hi [syed/vivek Name],
+
+During the unboxing session for [Student Name] [Student ID] from batch [Batch ID], we noticed that the following components were missing from the kit [Serial number of the kit]: [list the missing components].
+
+Could you please arrange for these to be shipped as soon as possible?
+
+Thanks.`
+                    },
+                    {
+                        id: 'lost-the-components',
+                        title: 'Lost the components',
+                        description: 'A student has lost some components of their kit, or a customer claims a component was missing, but you know it was in the kit unboxing session. Note: Check the session recording to verify.',
+                        to: 'PM',
+                        toEmails: 'pm@example.com',
+                        cc: 'SPM, Lead, cc-team',
+                        ccEmails: 'spm@example.com,lead@example.com,ccteam@example.com',
+                        draftMessage: `Hi [PM Name],
+
+A student, [Student Name] [Student ID], from batch [Batch ID], has informed me that they have lost the following components: [list the lost components]. I have verified the kit unboxing session recording, and the component is verified by the student.
+
+Can you please guide me on the process for a replacement?
+
+Thanks.`
+                    },
+                    {
+                        id: 'component-link-not-ordered',
+                        title: 'Link provided for component, but Cx didn’t order',
+                        description: 'We provided the link to order the component to the customer, but the customer is not ordering, and the child suffers. Note: Ask the CC team rep to call the customer and remind them to order the component. PG can also ask the child to remind their parents to order the component whose link has already been shared by the CC team or PG previously via email.',
+                        to: 'Jyoti or Akash',
+                        toEmails: 'jyoti@example.com,akash@example.com',
+                        cc: 'SPM, PM, Lead, CC team alias',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,ccteam@example.com',
+                        draftMessage: `Hi [Jyoti or Akash's name],
+
+A student [student name] [student ID] from my batch [Batch ID] is suffering because they have not ordered a replacement for a lost component. We have already provided the link to the customer.
+
+Could you please have the CC team representative call the customer and remind them to order the component?
+
+Thanks.`
+                    }
+                ]
             }
         ];
         // === END OF EDITABLE SECTION ===
