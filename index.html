@@ -12,6 +12,7 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
             color: #2d3748;
+            padding-left: 200px; /* Make space for the fixed sidebar */
         }
         .incident-card {
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -120,9 +121,36 @@
             transition: opacity 0.3s ease;
             z-index: 100;
         }
+        
+        /* New sidebar styling */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 100%;
+            background-color: white;
+            padding: 1.5rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+        .sidebar-link {
+            transition: background-color 0.2s ease;
+        }
+        .sidebar-link:hover {
+            background-color: #e2e8f0;
+        }
     </style>
 </head>
 <body class="p-6">
+    <!-- Left-hand navigation sidebar -->
+    <nav class="sidebar hidden md:block">
+        <h2 class="text-2xl font-bold mb-4">Categories</h2>
+        <ul id="sidebar-menu" class="space-y-2">
+            <!-- Menu items will be generated here -->
+        </ul>
+    </nav>
+    
     <div class="max-w-7xl mx-auto">
         <!-- Header section with title and search bar -->
         <header class="text-center mb-10">
@@ -191,7 +219,7 @@ Best regards,
                         id: 'upsell-parent-concern',
                         title: 'Parents\' concern after upsell',
                         description: 'Parent expresses that the child is upsold in the wrong tier, has problems with the curriculum and syllabus. Expectation of the parents is not met in the upsold tier (might come up mid-tier as well), or in case of evaluation',
-                        keywords: ['parent', 'concern', 'upsell', 'wrong tier', 'curriculum', 'syllabus', 'evaluation', 'meeting'],
+                        keywords: ['parent', 'concern', 'upsell', 'wrong tier', 'curriculum', 'syllabus', 'evaluation', 'meeting', 'not interested', 'don\'t want to continue'],
                         to: 'PM, SPM',
                         toEmails: 'pm@example.com,spm@example.com',
                         cc: 'Lead, Anurag, Roshan',
@@ -275,7 +303,7 @@ Best regards,
                         id: 'fast-slow-pace',
                         title: 'Fast/Slow pace',
                         description: 'When a student is either too fast or too slow in class.',
-                        keywords: ['pace', 'fast', 'slow', 'student speed', 'bored', 'frustrated'],
+                        keywords: ['pace', 'fast', 'slow', 'student speed', 'bored', 'frustrated', 'not understanding', 'curriculum', 'tier'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Anurag, PM, Lead',
@@ -630,6 +658,7 @@ Thanks.`
         const incidentSearch = document.getElementById('incidentSearch');
         const searchLoading = document.getElementById('searchLoading');
         const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+        const sidebarMenu = document.getElementById('sidebar-menu');
         let currentExpandedCategory = null;
 
         // Debounce function to prevent excessive API calls
@@ -641,40 +670,53 @@ Thanks.`
                 timeout = setTimeout(() => func.apply(context, args), delay);
             };
         };
-
-        // Function to get the full list of incidents or incidents from a specific category
-        const getIncidentData = () => {
-            if (currentExpandedCategory) {
-                const expandedCategory = incidentsData.find(cat => cat.category.toLowerCase().replace(' ', '-') === currentExpandedCategory);
-                return expandedCategory ? expandedCategory.incidents : [];
-            } else {
-                return incidentsData.flatMap(cat => cat.incidents);
-            }
-        };
         
         // This is the new, self-contained search logic
         const performLocalSearch = (searchTerm) => {
             const allIncidents = incidentsData.flatMap(cat => cat.incidents.map(inc => ({ ...inc, category: cat.category, borderColor: cat.borderColor })));
             const matchedIncidents = [];
-            const processedKeywords = new Set();
-        
-            searchTerm.toLowerCase().split(' ').forEach(term => {
-                if (term.length > 2) {
-                    allIncidents.forEach(incident => {
-                        const searchString = `${incident.title} ${incident.description} ${incident.keywords.join(' ')}`.toLowerCase();
-                        if (searchString.includes(term) && !processedKeywords.has(incident.id)) {
-                             // Assign a relevance score based on the number of matching keywords
-                            const score = incident.keywords.filter(keyword => keyword.includes(term)).length;
-                            matchedIncidents.push({ ...incident, score });
-                            processedKeywords.add(incident.id);
-                        }
-                    });
+            
+            // Normalize the search term by removing common words and breaking into key terms
+            const stopWords = new Set(['my', 'a', 'an', 'the', 'is', 'i', 'of', 'for', 'in', 'and', 'was', 'not', 'able', 'to', 'find', 'his', 'it', 'with', 'from', 'her', 'child', 'new']);
+            const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => !stopWords.has(term) && term.length > 2);
+            
+            // If the search term is empty, return all incidents
+            if (searchTerms.length === 0) {
+                 return allIncidents.map(inc => ({...inc, score: 0}));
+            }
+            
+            // Calculate a relevance score for each incident
+            allIncidents.forEach(incident => {
+                let score = 0;
+                // Combine relevant fields for scoring
+                const searchString = `${incident.title.toLowerCase()} ${incident.description.toLowerCase()} ${incident.keywords.join(' ').toLowerCase()}`;
+                
+                searchTerms.forEach(term => {
+                    if (searchString.includes(term)) {
+                        score++;
+                    }
+                });
+                
+                if (score > 0) {
+                    matchedIncidents.push({ ...incident, score });
                 }
             });
             
             // Sort by score in descending order
             matchedIncidents.sort((a, b) => b.score - a.score);
-            return matchedIncidents;
+
+            // Filter out low-relevance results.
+            const filteredResults = matchedIncidents.filter(inc => {
+                const queryWords = searchTerms.length;
+                if (queryWords > 1) {
+                    return inc.score >= 2;
+                } else {
+                    return inc.score >= 1;
+                }
+            });
+            
+            // Return filtered results
+            return filteredResults;
         };
 
         /**
@@ -779,6 +821,15 @@ Thanks.`
             return card;
         };
 
+        const renderSidebarMenu = () => {
+            sidebarMenu.innerHTML = '';
+            incidentsData.forEach(categoryData => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#${categoryData.category.toLowerCase().replace(' ', '-')}" class="block py-2 px-4 rounded-lg sidebar-link">${categoryData.category}</a>`;
+                sidebarMenu.appendChild(li);
+            });
+        };
+
         /**
          * Renders all incident cards to the container, grouped by category.
          */
@@ -791,6 +842,7 @@ Thanks.`
                 // Create a wrapper for each category and its cards
                 const categoryWrapper = document.createElement('div');
                 categoryWrapper.classList.add('category-wrapper');
+                categoryWrapper.id = categoryData.category.toLowerCase().replace(' ', '-');
 
                 // Create the category button and add its border color
                 const categoryCardButton = createCategoryCardButton(categoryData);
@@ -848,15 +900,17 @@ Thanks.`
         };
         
         const handleSearch = (searchTerm) => {
-            const allIncidents = incidentsData.flatMap(cat => cat.incidents.map(inc => ({ ...inc, category: cat.category, borderColor: cat.borderColor })));
+            searchLoading.classList.remove('hidden');
+
+            if (searchTerm === '') {
+                renderIncidents();
+                searchLoading.classList.add('hidden');
+                return;
+            }
+
+            const matchedIncidents = performLocalSearch(searchTerm);
+            searchLoading.classList.add('hidden');
             
-            // Filter incidents based on search term
-            const matchedIncidents = allIncidents.filter(incident => {
-                const searchString = `${incident.title} ${incident.description} ${incident.keywords.join(' ')}`.toLowerCase();
-                return searchTerm.toLowerCase().split(' ').some(term => searchString.includes(term));
-            });
-            
-            // Map the matched incidents back to their categories
             const matchedData = [];
             const processedCategories = new Set();
             matchedIncidents.forEach(incident => {
@@ -871,7 +925,6 @@ Thanks.`
                 }
             });
 
-            // Re-render the UI with only the matched data
             if (matchedData.length > 0) {
                  renderIncidents(matchedData);
             } else {
@@ -882,7 +935,6 @@ Thanks.`
                  incidentsContainer.appendChild(noResultsMessage);
             }
 
-            // Apply highlight/fade logic after rendering
             const categoryButtons = document.querySelectorAll('.category-card-button');
             const allCategories = incidentsData.map(cat => cat.category.toLowerCase().replace(' ', '-'));
             const matchedCategoryNames = matchedData.map(cat => cat.category.toLowerCase().replace(' ', '-'));
@@ -908,13 +960,13 @@ Thanks.`
             });
         };
         
-        // Event listener for the search input
+        const debouncedHandleSearch = debounce(handleSearch, 500);
         incidentSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             if (searchTerm === '') {
                 renderIncidents();
             } else {
-                handleSearch(searchTerm);
+                debouncedHandleSearch(searchTerm);
             }
         });
         
@@ -940,6 +992,7 @@ Thanks.`
         // Initial render of all incidents on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderIncidents();
+            renderSidebarMenu();
             toggleScrollButton();
         });
     </script>
