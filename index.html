@@ -86,7 +86,21 @@
         .highlighted-category:hover {
              transform: translateY(-5px); /* Maintain the lift */
         }
-        
+        .search-loading {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+        }
+        .search-loading svg {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="p-6">
@@ -100,7 +114,12 @@
         <!-- Search bar -->
         <div class="mb-10 flex justify-center">
             <div class="relative w-full max-w-2xl">
-                <input type="text" id="incidentSearch" placeholder="Search for an incident..." class="w-full pl-12 pr-4 py-3 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-md text-lg">
+                <input type="text" id="incidentSearch" placeholder="Smart Search..." class="w-full pl-12 pr-4 py-3 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-md text-lg">
+                <div id="searchLoading" class="search-loading hidden">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.418 10h.582M18 10c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zm0 0v14" />
+                    </svg>
+                </div>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -130,6 +149,7 @@
                         id: 'upsell-tier-completion',
                         title: 'Tier Completion (after session 47)',
                         description: 'When your batch is about to complete TIER (at session number 47)',
+                        keywords: ['upsell', 'tier', 'completion', 'session 47', 'batch complete', 'final session'],
                         to: 'LTV Counsellor',
                         toEmails: 'ltvcounselor@example.com',
                         cc: 'LTV alias, Lead , preeti, akansha negi, PM, Roshan',
@@ -146,6 +166,7 @@ Best regards,
                         id: 'upsell-parent-concern',
                         title: 'Parents\' concern after upsell',
                         description: 'Parent expresses that the child is upsold in the wrong tier, has problems with the curriculum and syllabus. Expectation of the parents is not met in the upsold tier (might come up mid-tier as well), or in case of evaluation',
+                        keywords: ['parent', 'concern', 'upsell', 'wrong tier', 'curriculum', 'syllabus', 'evaluation', 'meeting'],
                         to: 'PM, SPM',
                         toEmails: 'pm@example.com,spm@example.com',
                         cc: 'Lead, Anurag, Roshan',
@@ -163,6 +184,7 @@ Best regards,
                         id: 'upsell-absent-1-2',
                         title: 'Absenteeism in upsell batch (sessions 1-2)',
                         description: 'The student did not join for the first two sessions.',
+                        keywords: ['absent', 'absenteeism', 'upsell', 'sessions 1-2', 'missed class'],
                         to: 'Counsellor',
                         toEmails: 'counsellor@example.com',
                         cc: 'Lead, ltv, PM, Roshan',
@@ -181,6 +203,7 @@ Best regards,
                         id: 'upsell-absent-1-4',
                         title: 'Absenteeism in upsell batch (sessions 1-4)',
                         description: 'The student did not join for the first four sessions. NOTE: SPM to ask ushma to mark as course completed and inform LTV',
+                        keywords: ['absent', 'absenteeism', 'upsell', 'sessions 1-4', 'course completed'],
                         to: 'PM/SPM',
                         toEmails: 'pm@example.com,spm@example.com',
                         cc: 'Lead, ltv, PM, Roshan',
@@ -205,6 +228,7 @@ Best regards,
                         id: 'pause-related-parent-informed',
                         title: 'Parent informed',
                         description: 'Parents informed in the class that the child will be going on a pause. NOTE: PG should get the info whenever a student joins back after a pause. PG to confirm from the student about the kit (PG to get trained on how to apply for pause on LMS)',
+                        keywords: ['pause', 'parent informed', 'break', 'session hold'],
                         to: 'jyoti/akash chaudhary',
                         toEmails: 'jyoti@example.com,akashchaudhary@example.com',
                         cc: 'Lead, cc-team@moonpreneur.com',
@@ -226,6 +250,7 @@ Best regards,
                         id: 'fast-slow-pace',
                         title: 'Fast/Slow pace',
                         description: 'When a student is either too fast or too slow in class.',
+                        keywords: ['pace', 'fast', 'slow', 'student speed', 'bored', 'frustrated'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Anurag, PM, Lead',
@@ -242,6 +267,7 @@ Thanks.`
                         id: 'student-behavior-issues',
                         title: 'Student Behavior Issues',
                         description: 'If a student does not fit in the batch due to various reasons. Note: SPM to take further action and tag people based on the situation.',
+                        keywords: ['behavior', 'student issue', 'disruptive', 'inappropriate language', 'refusing to participate'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Anurag, PM, Lead',
@@ -258,6 +284,7 @@ Thanks.`
                         id: 'parents-interaction-with-pgs',
                         title: 'Parents\' Interaction with PGs',
                         description: 'The customer says something, and the PG should not reply with answers, but instead let them know that a team will get in touch and set up a separate meeting. After the session, the PG should drop an email. Note: SPM to analyze the situation and decide who all are supposed to be tagged further.',
+                        keywords: ['parent', 'interaction', 'meeting', 'team connect', 'separate discussion'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Lead, PM, Anurag',
@@ -274,6 +301,7 @@ Thanks.`
                         id: 'parent-requests-ptm',
                         title: 'If the Parent is asking for PTM',
                         description: 'When a parent directly requests a Parent-Teacher Meeting. SPM will tag and align a Counselor or Senior team member as per the requirement.',
+                        keywords: ['ptm', 'parent teacher meeting', 'request', 'schedule meeting'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Lead, PM',
@@ -290,6 +318,7 @@ Thanks.`
                         id: 'parents-direct-email-to-pg',
                         title: 'If the parents write a direct email to PG',
                         description: 'If the email is related to assignments or credentials of the platform, the PG can reply directly after a discussion with the lead, while keeping the Lead and PM in CC. Otherwise, the email should be forwarded.',
+                        keywords: ['parent email', 'direct email', 'assignment', 'credentials', 'forward email'],
                         to: 'PM',
                         toEmails: 'pm@example.com',
                         cc: 'Lead, SPM',
@@ -306,6 +335,7 @@ Thanks.`
                         id: 'students-joining-late-ipad-phone-1',
                         title: 'Students Joining Late with Ipad or Phone (sessions 1-12)',
                         description: 'For students joining late in the first 12 sessions.',
+                        keywords: ['joining late', 'ipad', 'phone', 'sessions 1-12', 'access issue'],
                         to: 'Counsellor',
                         toEmails: 'counsellor@example.com',
                         cc: 'cc-team alias, PM, SPM, Lead',
@@ -322,6 +352,7 @@ Thanks.`
                         id: 'students-joining-late-ipad-phone-2',
                         title: 'Students Joining Late with Ipad or Phone (sessions 13+)',
                         description: 'For students joining late from the 13th session onwards, or joining with an iPad or Phone.',
+                        keywords: ['joining late', 'ipad', 'phone', 'sessions 13+', 'access issue'],
                         to: 'Akash chaudhary/jyoti',
                         toEmails: 'akashchaudhary@example.com,jyoti@example.com',
                         cc: 'cc-team alias, PM, SPM, Lead',
@@ -344,6 +375,7 @@ Thanks.`
                         id: 'address-verification',
                         title: 'Address verification',
                         description: 'Not receiving OTP, changing address, parents not available in the session for confirmation, all the verification sessions are completed and still the address remains unconfirmed, paused students join the batch and we cannot verify the address due to the verification not being configured. Note: SPM to coordinate with the CC team or ECOM team to get the verification done. Please raise a ticket to vivek.j@moonpreneur.com for external address verification. Collect the address in the class and mention it in the ticket along with the batch ID and kit name (Confirm address tag resets when the batch changes or the wrong status is visible).',
+                        keywords: ['address', 'verification', 'otp', 'change address', 'unconfirmed', 'kit delivery'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Lead, PM, chetan',
@@ -360,6 +392,7 @@ Thanks.`
                         id: 'shipment-issues-entire-kit',
                         title: 'Shipment Issues (entire kit)',
                         description: 'The student did not receive the kit, and the unboxing session is approaching or has passed. Note: Ask for the tracking details.',
+                        keywords: ['shipment', 'kit', 'not received', 'unboxing session', 'tracking details'],
                         to: 'Syed, Vivek Jadon',
                         toEmails: 'syed@example.com,vivekjadon@example.com',
                         cc: 'Lead, PM, SPM',
@@ -376,6 +409,7 @@ Thanks.`
                         id: 'shipment-issues-order-not-placed',
                         title: 'Shipment Issues (order not placed)',
                         description: 'The student did not receive the kit, and the unboxing session is approaching or has passed. The ECOM team says that the order is not placed. Note: SPM to initiate the shipment on an urgent basis. PG to collect the address promptly within the session.',
+                        keywords: ['shipment', 'order not placed', 'ecom team', 'urgent shipment'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Lead, PM',
@@ -392,6 +426,7 @@ Thanks.`
                         id: 'kits-held-at-courier-office',
                         title: 'Kits held at courier office (delays)',
                         description: 'The tracking link shows Kits held at courier office that is causing delay. Note: We can offer makeup sessions for practical testing of the missed session without a kit. (Only SPM to approve this).',
+                        keywords: ['kit', 'held', 'courier', 'delays', 'tracking', 'makeup sessions'],
                         to: 'Syed, Vivek Jadon',
                         toEmails: 'syed@example.com,vivekjadon@example.com',
                         cc: 'Lead, PM, SPM',
@@ -408,6 +443,7 @@ Thanks.`
                         id: 'wrong-kit-address-duplicate',
                         title: 'Wrong kit/address/duplicate kits',
                         description: 'Wrong kit shipped, kit sent to the wrong address, or duplicate kits. Note: PM/SPM to take action and get the right shipment initiated. Take help from the CC team if needed.',
+                        keywords: ['wrong kit', 'wrong address', 'duplicate kit', 'shipment initiated'],
                         to: 'Syed, Vivek Jadon',
                         toEmails: 'syed@example.com,vivekjadon@example.com',
                         cc: 'Lead, PM, SPM',
@@ -424,6 +460,7 @@ Thanks.`
                         id: 'kit-not-delivered-in-batch',
                         title: 'Kit not delivered in a complete batch',
                         description: 'None of the students in a batch has received the kit, and the kit unboxing session is approaching. Note: SPM to initiate the delivery and check the fault. Also, enable the revision/buffer session.',
+                        keywords: ['kit not delivered', 'batch issue', 'unboxing', 'revision session'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Lead, PM',
@@ -438,6 +475,7 @@ Thanks.`
                         id: 'kit-delivered-parent-denies',
                         title: 'Kit delivered, parent denies',
                         description: 'The status in the tracking link shows the kit is delivered, but the customer is saying that they have not received any kit. Note: SPM to discuss this with a counselor or CC team, and discuss this with the customer, and investigate the problem with Syed/Vivek.',
+                        keywords: ['kit delivered', 'parent denies', 'tracking link', 'investigate', 'counselor'],
                         to: 'SPM',
                         toEmails: 'spm@example.com',
                         cc: 'Lead, PM',
@@ -454,6 +492,7 @@ Thanks.`
                         id: 'parent-requested-shipment-hold',
                         title: 'Parent requested shipment hold',
                         description: 'Parents requesting to hold the shipment for some time (travelling).',
+                        keywords: ['shipment hold', 'parent request', 'travelling'],
                         to: 'Syed, Vivek Jadon',
                         toEmails: 'syed@example.com,vivekjadon@example.com',
                         cc: 'Lead, PM, SPM',
@@ -470,6 +509,7 @@ Thanks.`
                         id: 'kit-on-hold-payment-issues',
                         title: 'Kit on hold due to payment issues',
                         description: 'Kit is kept on hold due to payment issues like customer has not paid for the enrolled course.',
+                        keywords: ['kit on hold', 'payment issues', 'enrolled course'],
                         to: 'Akansha, counsellor',
                         toEmails: 'akansha@example.com,counsellor@example.com',
                         cc: 'Lead, PM, SPM',
@@ -486,12 +526,13 @@ Thanks.`
             },
             {
                 category: 'Kit Component Issues',
-                borderColor: '#FF0000', // Red
+                borderColor: '#A78BFA', // Purple
                 incidents: [
                     {
                         id: 'component-not-working',
                         title: 'Component not working',
                         description: 'If any component in the kit is not working, physically damaged, has factory issues, malfunctioning including the microcontroller, our internal boards, off-the-shelf components (LEDS, POT, SENSORS, other modules), or problems related to batteries (RF, IR remote, and car kit batteries). Note: Debugging team to decide on sessions, replacement, or student consultation.',
+                        keywords: ['component not working', 'physically damaged', 'microcontroller', 'batteries', 'replacement'],
                         to: 'Debugging alias',
                         toEmails: 'debugging@example.com',
                         cc: 'PM, Lead, SPM',
@@ -508,6 +549,7 @@ Thanks.`
                         id: 'components-missing-unboxing',
                         title: 'Components missing during the kit unboxing session',
                         description: 'Some components are missing from the kit during the unboxing session. Note: PM/SPM to verify and approve the shipment of missing components.',
+                        keywords: ['missing components', 'unboxing session', 'kit issues', 'approve shipment'],
                         to: 'syed, vivek',
                         toEmails: 'syed@example.com,vivek@example.com',
                         cc: 'SPM, PM, Lead, Saurabh',
@@ -524,6 +566,7 @@ Thanks.`
                         id: 'lost-the-components',
                         title: 'Lost the components',
                         description: 'A student has lost some components of their kit, or a customer claims a component was missing, but you know it was in the kit unboxing session. Note: Check the session recording to verify.',
+                        keywords: ['lost components', 'missing', 'kit', 'session recording', 'replacement'],
                         to: 'PM',
                         toEmails: 'pm@example.com',
                         cc: 'SPM, Lead, cc-team',
@@ -540,6 +583,7 @@ Thanks.`
                         id: 'component-link-not-ordered',
                         title: 'Link provided for component, but Cx didn’t order',
                         description: 'We provided the link to order the component to the customer, but the customer is not ordering, and the child suffers. Note: Ask the CC team rep to call the customer and remind them to order the component. PG can also ask the child to remind their parents to order the component whose link has already been shared by the CC team or PG previously via email.',
+                        keywords: ['link provided', 'customer didn\'t order', 'component', 'reminder call'],
                         to: 'Jyoti or Akash',
                         toEmails: 'jyoti@example.com,akash@example.com',
                         cc: 'SPM, PM, Lead, CC team alias',
@@ -559,8 +603,90 @@ Thanks.`
         
         const incidentsContainer = document.getElementById('incidentsContainer');
         const incidentSearch = document.getElementById('incidentSearch');
-        const messageBox = document.getElementById('messageBox');
+        const searchLoading = document.getElementById('searchLoading');
         let currentExpandedCategory = null;
+
+        // Debounce function to prevent excessive API calls
+        const debounce = (func, delay) => {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        };
+
+        // Function to get the full list of incidents or incidents from a specific category
+        const getIncidentData = () => {
+            if (currentExpandedCategory) {
+                const expandedCategory = incidentsData.find(cat => cat.category.toLowerCase().replace(' ', '-') === currentExpandedCategory);
+                return expandedCategory ? expandedCategory.incidents : [];
+            } else {
+                return incidentsData.flatMap(cat => cat.incidents);
+            }
+        };
+
+        // Function to call the Gemini API
+        const callGeminiAPI = async (query, incidentData) => {
+            const apiKey = "" 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const incidentsList = incidentData.map(inc => ({ id: inc.id, title: inc.title, description: inc.description, keywords: inc.keywords }));
+
+            const prompt = `I have a list of incidents. A user has a query: "${query}". Please find the most relevant incidents and return their IDs in a JSON array. Consider keywords and context. If no matches are found, return an empty array. The incidents data is: ${JSON.stringify(incidentsList)}`;
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [{
+                        text: prompt
+                    }]
+                }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "id": { "type": "STRING" },
+                                "score": { "type": "NUMBER" }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            let response;
+            for (let i = 0; i < 3; i++) { // Retry up to 3 times with exponential backoff
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) break;
+                } catch (error) {
+                    // Fail silently, a new request will be made on the next retry
+                }
+                await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i))); 
+            }
+
+            if (!response || !response.ok) {
+                console.error('API call failed after retries.');
+                return [];
+            }
+
+            try {
+                const result = await response.json();
+                const jsonString = result.candidates[0].content.parts[0].text;
+                return JSON.parse(jsonString);
+            } catch (error) {
+                console.error('Error parsing Gemini API response:', error);
+                return [];
+            }
+        };
 
         /**
          * Copies text to the clipboard and shows a confirmation message.
@@ -735,107 +861,83 @@ Thanks.`
                 });
             });
         };
-
-        const handleSearch = (searchTerm) => {
-            const categoryButtons = document.querySelectorAll('.category-card-button');
-            const allCardsContainers = document.querySelectorAll('.cards-container');
+        
+        const handleSearch = async (searchTerm) => {
+            const categoryButtonsContainer = document.getElementById('categoryButtonsContainer');
+            const expandedCardsContainer = document.getElementById('expandedCardsContainer');
             
+            // Show loading indicator
+            searchLoading.classList.remove('hidden');
+
             // If the search term is empty, restore original state
             if (searchTerm === '') {
-                // Show all category buttons
-                categoryButtons.forEach(button => {
-                    button.style.display = 'flex';
-                    button.classList.remove('faded-category', 'highlighted-category');
-                    button.querySelector('.caret-icon').classList.remove('rotate');
-                });
-                // Close all incident card containers
-                allCardsContainers.forEach(container => container.style.display = 'none');
-                currentExpandedCategory = null;
+                renderIncidents();
+                searchLoading.classList.add('hidden');
                 return;
             }
 
-            // If a category is expanded, search only within it
-            if (currentExpandedCategory) {
-                const expandedContainer = document.querySelector(`.cards-container[data-category="${currentExpandedCategory}"]`);
-                if (expandedContainer) {
-                    const cards = expandedContainer.querySelectorAll('.incident-card');
-                    let hasMatch = false;
-                    cards.forEach(card => {
-                        if (card.getAttribute('data-search-terms').includes(searchTerm)) {
-                            card.style.display = 'block';
-                            hasMatch = true;
-                        } else {
-                            card.style.display = 'none';
+            // Get incident data for the search
+            const incidentsToSearch = getIncidentData();
+            
+            // Call Gemini API to get matching incident IDs and scores
+            const matchedIncidentsWithScores = await callGeminiAPI(searchTerm, incidentsToSearch);
+            
+            // Sort incidents by score in descending order
+            matchedIncidentsWithScores.sort((a, b) => b.score - a.score);
+            const matchingIncidentIds = matchedIncidentsWithScores.map(item => item.id);
+
+            // Hide loading indicator
+            searchLoading.classList.add('hidden');
+
+            // Clear the containers
+            categoryButtonsContainer.innerHTML = '';
+            expandedCardsContainer.innerHTML = '';
+            
+            // Display matched incidents
+            if (matchingIncidentIds.length > 0) {
+                const matchedCategories = new Set();
+                matchingIncidentIds.forEach(id => {
+                    const incident = incidentsData.flatMap(cat => cat.incidents).find(inc => inc.id === id);
+                    if (incident) {
+                        const category = incidentsData.find(cat => cat.incidents.some(inc => inc.id === id));
+                        if (category) {
+                            if (!matchedCategories.has(category.category)) {
+                                const categoryCardButton = createCategoryCardButton(category);
+                                categoryButtonsContainer.appendChild(categoryCardButton);
+                                categoryCardButton.style.display = 'flex';
+                                categoryCardButton.classList.add('highlighted-category');
+                                categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
+                                matchedCategories.add(category.category);
+                            }
+
+                            let cardsContainer = expandedCardsContainer.querySelector(`.cards-container[data-category="${category.category.toLowerCase().replace(' ', '-')}"]`);
+                            if (!cardsContainer) {
+                                cardsContainer = document.createElement('div');
+                                cardsContainer.classList.add('cards-container', 'p-6', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
+                                cardsContainer.setAttribute('data-category', category.category.toLowerCase().replace(' ', '-'));
+                                expandedCardsContainer.appendChild(cardsContainer);
+                            }
+                            
+                            const card = createIncidentCard(incident, category.borderColor);
+                            cardsContainer.appendChild(card);
+                            cardsContainer.style.display = 'grid';
                         }
-                    });
-                    // Show the expanded category button and its cards if there's a match
-                    const expandedCategoryButton = document.querySelector(`.category-card-button[data-category="${currentExpandedCategory}"]`);
-                    if (hasMatch) {
-                        expandedCategoryButton.style.display = 'flex';
-                        expandedContainer.style.display = 'grid';
-                        expandedCategoryButton.classList.add('highlighted-category');
-                    } else {
-                        expandedCategoryButton.style.display = 'flex';
-                        expandedContainer.style.display = 'none';
-                        expandedCategoryButton.classList.add('faded-category');
-                    }
-                    // Hide all other category buttons and containers
-                    categoryButtons.forEach(button => {
-                        if (button.getAttribute('data-category') !== currentExpandedCategory) {
-                            button.style.display = 'none';
-                        }
-                    });
-                }
-            } else {
-                // No category is expanded, search all categories
-                let foundMatch = false;
-                categoryButtons.forEach(button => {
-                    const categoryName = button.getAttribute('data-category');
-                    const cardsContainer = document.querySelector(`.cards-container[data-category="${categoryName}"]`);
-                    let hasMatch = false;
-                    
-                    const cards = cardsContainer.querySelectorAll('.incident-card');
-                    cards.forEach(card => {
-                        if (card.getAttribute('data-search-terms').includes(searchTerm)) {
-                            card.style.display = 'block';
-                            hasMatch = true;
-                            foundMatch = true;
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                    
-                    if (hasMatch) {
-                        button.style.display = 'flex';
-                        cardsContainer.style.display = 'grid';
-                        button.classList.add('highlighted-category');
-                        button.querySelector('.caret-icon').classList.add('rotate');
-                    } else {
-                        button.style.display = 'flex';
-                        cardsContainer.style.display = 'none';
-                        button.classList.remove('highlighted-category');
-                        button.querySelector('.caret-icon').classList.remove('rotate');
                     }
                 });
-                 // If no match is found anywhere, fade all categories
-                if (!foundMatch && searchTerm !== '') {
-                    categoryButtons.forEach(button => {
-                        button.classList.add('faded-category');
-                    });
-                }
+            } else {
+                 const noResultsMessage = document.createElement('p');
+                 noResultsMessage.classList.add('text-center', 'text-gray-500', 'mt-10');
+                 noResultsMessage.textContent = 'No matching incidents found. Please try a different query.';
+                 incidentsContainer.appendChild(noResultsMessage);
             }
         };
+
+        const debouncedHandleSearch = debounce(handleSearch, 500);
 
         // Event listener for the search input
         incidentSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            
-            // Re-render based on the search term
-            if (searchTerm === '') {
-                renderIncidents(); // Reset the UI to its initial state
-            } else {
-                handleSearch(searchTerm);
-            }
+            debouncedHandleSearch(searchTerm);
         });
 
         // Initial render of all incidents on page load
