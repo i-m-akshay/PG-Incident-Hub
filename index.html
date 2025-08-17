@@ -101,6 +101,25 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Scroll to bottom button styling */
+        #scrollToBottomBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #3b82f6;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
     </style>
 </head>
 <body class="p-6">
@@ -132,6 +151,13 @@
         </div>
     </div>
 
+    <!-- Scroll to bottom button -->
+    <div id="scrollToBottomBtn" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+    </div>
+
     <!-- Message box for copy confirmation -->
     <div id="messageBox" class="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transform translate-y-full transition-all duration-500 z-50">
         Message copied to clipboard!
@@ -139,7 +165,6 @@
 
     <script>
         // === START OF EDITABLE SECTION ===
-        // This is the array of all incidents, now structured with categories.
         const incidentsData = [
             {
                 category: 'Upsell',
@@ -604,6 +629,7 @@ Thanks.`
         const incidentsContainer = document.getElementById('incidentsContainer');
         const incidentSearch = document.getElementById('incidentSearch');
         const searchLoading = document.getElementById('searchLoading');
+        const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
         let currentExpandedCategory = null;
 
         // Debounce function to prevent excessive API calls
@@ -625,67 +651,30 @@ Thanks.`
                 return incidentsData.flatMap(cat => cat.incidents);
             }
         };
-
-        // Function to call the Gemini API
-        const callGeminiAPI = async (query, incidentData) => {
-            const apiKey = "" 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const incidentsList = incidentData.map(inc => ({ id: inc.id, title: inc.title, description: inc.description, keywords: inc.keywords }));
-
-            const prompt = `I have a list of incidents. A user has a query: "${query}". Please find the most relevant incidents and return their IDs in a JSON array. Consider keywords and context. If no matches are found, return an empty array. The incidents data is: ${JSON.stringify(incidentsList)}`;
-
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                "id": { "type": "STRING" },
-                                "score": { "type": "NUMBER" }
-                            }
+        
+        // This is the new, self-contained search logic
+        const performLocalSearch = (searchTerm) => {
+            const allIncidents = incidentsData.flatMap(cat => cat.incidents.map(inc => ({ ...inc, category: cat.category, borderColor: cat.borderColor })));
+            const matchedIncidents = [];
+            const processedKeywords = new Set();
+        
+            searchTerm.toLowerCase().split(' ').forEach(term => {
+                if (term.length > 2) {
+                    allIncidents.forEach(incident => {
+                        const searchString = `${incident.title} ${incident.description} ${incident.keywords.join(' ')}`.toLowerCase();
+                        if (searchString.includes(term) && !processedKeywords.has(incident.id)) {
+                             // Assign a relevance score based on the number of matching keywords
+                            const score = incident.keywords.filter(keyword => keyword.includes(term)).length;
+                            matchedIncidents.push({ ...incident, score });
+                            processedKeywords.add(incident.id);
                         }
-                    }
-                }
-            };
-            
-            let response;
-            for (let i = 0; i < 3; i++) { // Retry up to 3 times with exponential backoff
-                try {
-                    response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
                     });
-                    if (response.ok) break;
-                } catch (error) {
-                    // Fail silently, a new request will be made on the next retry
                 }
-                await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i))); 
-            }
-
-            if (!response || !response.ok) {
-                console.error('API call failed after retries.');
-                return [];
-            }
-
-            try {
-                const result = await response.json();
-                const jsonString = result.candidates[0].content.parts[0].text;
-                return JSON.parse(jsonString);
-            } catch (error) {
-                console.error('Error parsing Gemini API response:', error);
-                return [];
-            }
+            });
+            
+            // Sort by score in descending order
+            matchedIncidents.sort((a, b) => b.score - a.score);
+            return matchedIncidents;
         };
 
         /**
@@ -793,25 +782,20 @@ Thanks.`
         /**
          * Renders all incident cards to the container, grouped by category.
          */
-        const renderIncidents = () => {
+        const renderIncidents = (filteredIncidents = null) => {
+            const allIncidents = filteredIncidents ? filteredIncidents : incidentsData;
+            
             incidentsContainer.innerHTML = '';
             
-            // Container for category card buttons to be in a row
-            const categoryButtonsContainer = document.createElement('div');
-            categoryButtonsContainer.id = 'categoryButtonsContainer';
-            categoryButtonsContainer.classList.add('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
-            incidentsContainer.appendChild(categoryButtonsContainer);
+            allIncidents.forEach(categoryData => {
+                // Create a wrapper for each category and its cards
+                const categoryWrapper = document.createElement('div');
+                categoryWrapper.classList.add('category-wrapper');
 
-            // Container for all expanded incident cards, to be displayed below the category buttons
-            const expandedCardsContainer = document.createElement('div');
-            expandedCardsContainer.id = 'expandedCardsContainer';
-            expandedCardsContainer.classList.add('mt-8');
-            incidentsContainer.appendChild(expandedCardsContainer);
-
-            incidentsData.forEach(categoryData => {
-                // Create the category button and add it to its container
+                // Create the category button and add its border color
                 const categoryCardButton = createCategoryCardButton(categoryData);
-                categoryButtonsContainer.appendChild(categoryCardButton);
+                categoryCardButton.style.borderColor = categoryData.borderColor;
+                categoryWrapper.appendChild(categoryCardButton);
 
                 // Create the hidden container for incident cards for this category
                 const cardsContainer = document.createElement('div');
@@ -824,7 +808,8 @@ Thanks.`
                     cardsContainer.appendChild(card);
                 });
 
-                expandedCardsContainer.appendChild(cardsContainer);
+                categoryWrapper.appendChild(cardsContainer);
+                incidentsContainer.appendChild(categoryWrapper);
 
                 categoryCardButton.addEventListener('click', () => {
                     const isOpen = cardsContainer.style.display === 'grid';
@@ -862,87 +847,100 @@ Thanks.`
             });
         };
         
-        const handleSearch = async (searchTerm) => {
-            const categoryButtonsContainer = document.getElementById('categoryButtonsContainer');
-            const expandedCardsContainer = document.getElementById('expandedCardsContainer');
+        const handleSearch = (searchTerm) => {
+            const allIncidents = incidentsData.flatMap(cat => cat.incidents.map(inc => ({ ...inc, category: cat.category, borderColor: cat.borderColor })));
             
-            // Show loading indicator
-            searchLoading.classList.remove('hidden');
-
-            // If the search term is empty, restore original state
-            if (searchTerm === '') {
-                renderIncidents();
-                searchLoading.classList.add('hidden');
-                return;
-            }
-
-            // Get incident data for the search
-            const incidentsToSearch = getIncidentData();
+            // Filter incidents based on search term
+            const matchedIncidents = allIncidents.filter(incident => {
+                const searchString = `${incident.title} ${incident.description} ${incident.keywords.join(' ')}`.toLowerCase();
+                return searchTerm.toLowerCase().split(' ').some(term => searchString.includes(term));
+            });
             
-            // Call Gemini API to get matching incident IDs and scores
-            const matchedIncidentsWithScores = await callGeminiAPI(searchTerm, incidentsToSearch);
-            
-            // Sort incidents by score in descending order
-            matchedIncidentsWithScores.sort((a, b) => b.score - a.score);
-            const matchingIncidentIds = matchedIncidentsWithScores.map(item => item.id);
+            // Map the matched incidents back to their categories
+            const matchedData = [];
+            const processedCategories = new Set();
+            matchedIncidents.forEach(incident => {
+                const category = incidentsData.find(cat => cat.incidents.some(inc => inc.id === incident.id));
+                if (category && !processedCategories.has(category.category)) {
+                    matchedData.push({
+                        category: category.category,
+                        borderColor: category.borderColor,
+                        incidents: category.incidents.filter(inc => matchedIncidents.some(mInc => mInc.id === inc.id))
+                    });
+                    processedCategories.add(category.category);
+                }
+            });
 
-            // Hide loading indicator
-            searchLoading.classList.add('hidden');
-
-            // Clear the containers
-            categoryButtonsContainer.innerHTML = '';
-            expandedCardsContainer.innerHTML = '';
-            
-            // Display matched incidents
-            if (matchingIncidentIds.length > 0) {
-                const matchedCategories = new Set();
-                matchingIncidentIds.forEach(id => {
-                    const incident = incidentsData.flatMap(cat => cat.incidents).find(inc => inc.id === id);
-                    if (incident) {
-                        const category = incidentsData.find(cat => cat.incidents.some(inc => inc.id === id));
-                        if (category) {
-                            if (!matchedCategories.has(category.category)) {
-                                const categoryCardButton = createCategoryCardButton(category);
-                                categoryButtonsContainer.appendChild(categoryCardButton);
-                                categoryCardButton.style.display = 'flex';
-                                categoryCardButton.classList.add('highlighted-category');
-                                categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
-                                matchedCategories.add(category.category);
-                            }
-
-                            let cardsContainer = expandedCardsContainer.querySelector(`.cards-container[data-category="${category.category.toLowerCase().replace(' ', '-')}"]`);
-                            if (!cardsContainer) {
-                                cardsContainer = document.createElement('div');
-                                cardsContainer.classList.add('cards-container', 'p-6', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
-                                cardsContainer.setAttribute('data-category', category.category.toLowerCase().replace(' ', '-'));
-                                expandedCardsContainer.appendChild(cardsContainer);
-                            }
-                            
-                            const card = createIncidentCard(incident, category.borderColor);
-                            cardsContainer.appendChild(card);
-                            cardsContainer.style.display = 'grid';
-                        }
-                    }
-                });
+            // Re-render the UI with only the matched data
+            if (matchedData.length > 0) {
+                 renderIncidents(matchedData);
             } else {
                  const noResultsMessage = document.createElement('p');
                  noResultsMessage.classList.add('text-center', 'text-gray-500', 'mt-10');
                  noResultsMessage.textContent = 'No matching incidents found. Please try a different query.';
+                 incidentsContainer.innerHTML = '';
                  incidentsContainer.appendChild(noResultsMessage);
             }
+
+            // Apply highlight/fade logic after rendering
+            const categoryButtons = document.querySelectorAll('.category-card-button');
+            const allCategories = incidentsData.map(cat => cat.category.toLowerCase().replace(' ', '-'));
+            const matchedCategoryNames = matchedData.map(cat => cat.category.toLowerCase().replace(' ', '-'));
+
+            categoryButtons.forEach(button => {
+                const categoryName = button.getAttribute('data-category');
+                if (matchedCategoryNames.includes(categoryName)) {
+                     button.classList.add('highlighted-category');
+                     button.querySelector('.caret-icon').classList.add('rotate');
+                } else {
+                    if (allCategories.includes(categoryName)) {
+                       button.classList.add('faded-category');
+                    }
+                }
+            });
+
+            const allCardsContainers = document.querySelectorAll('.cards-container');
+            allCardsContainers.forEach(container => {
+                const categoryName = container.getAttribute('data-category');
+                 if (matchedCategoryNames.includes(categoryName)) {
+                    container.style.display = 'grid';
+                }
+            });
         };
-
-        const debouncedHandleSearch = debounce(handleSearch, 500);
-
+        
         // Event listener for the search input
         incidentSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            debouncedHandleSearch(searchTerm);
+            if (searchTerm === '') {
+                renderIncidents();
+            } else {
+                handleSearch(searchTerm);
+            }
+        });
+        
+        const toggleScrollButton = () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                scrollToBottomBtn.style.opacity = '0';
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                scrollToBottomBtn.style.opacity = '1';
+                scrollToBottomBtn.classList.remove('hidden');
+            }
+        };
+
+        window.addEventListener('scroll', toggleScrollButton);
+        window.addEventListener('resize', toggleScrollButton);
+        scrollToBottomBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
         });
 
         // Initial render of all incidents on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderIncidents();
+            toggleScrollButton();
         });
     </script>
 </body>
