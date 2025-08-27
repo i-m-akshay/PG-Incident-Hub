@@ -12,7 +12,7 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
             color: #2d3748;
-            padding-left: 0; /* Remove initial padding, it will be added dynamically */
+            padding-left: 0;
             transition: padding-left 0.3s ease-in-out;
         }
         .incident-card {
@@ -216,10 +216,11 @@
             </div>
         </div>
 
-        <!-- Incidents container -->
+        <!-- Main content area for rendering categories and cards -->
         <div id="incidentsContainer" class="space-y-8">
-            <!-- All content will be dynamically generated here by JavaScript -->
+            <!-- All content will be dynamically generated here -->
         </div>
+
     </div>
 
     <!-- Scroll to bottom button -->
@@ -269,7 +270,7 @@ Best regards,
                         id: 'upsell-parent-concern',
                         title: 'Parents\' concern after upsell',
                         description: 'Parent expresses that the child is upsold in the wrong tier, has problems with the curriculum and syllabus. Expectation of the parents is not met in the upsold tier (might come up mid-tier as well), or in case of evaluation',
-                        keywords: ['parent', 'concern', 'upsell', 'wrong tier', 'curriculum', 'syllabus', 'evaluation', 'meeting', 'not interested', 'don\'t want to continue'],
+                        keywords: ['parent', 'concern', 'upsell', 'wrong tier', 'curriculum', 'syllabus', 'evaluation', 'meeting', 'not interested', 'don\'t want to continue', 'quit', 'discontinue'],
                         to: 'PM, SPM',
                         toEmails: 'pm@example.com,spm@example.com',
                         cc: 'Lead, Anurag, Roshan',
@@ -700,21 +701,352 @@ Could you please have the CC team representative call the customer and remind th
 Thanks.`
                     }
                 ]
+            },
+            {
+                category: 'LMS & Alignment Issues',
+                borderColor: '#60A5FA', // Light Blue
+                incidents: [
+                    {
+                        id: 'batch-not-visible',
+                        title: 'Batch not visible in dashboard',
+                        description: 'The batch is not visible in your dashboard.',
+                        keywords: ['batch not visible', 'dashboard', 'lms issue'],
+                        to: 'Roshan',
+                        toEmails: 'roshan@example.com',
+                        cc: 'MIS, Ushma, Lead',
+                        ccEmails: 'mis@example.com,ushma@example.com,lead@example.com',
+                        draftMessage: `Hi Roshan,
+
+I'm facing an issue with the LMS in my batch [Batch ID]. The batch is not visible to me.
+
+Could you please look into this?
+
+Thanks.`
+                    },
+                    {
+                        id: 'student-info-missing-incorrect',
+                        title: 'Student information missing/incorrect',
+                        description: 'A student\'s name is not in the PG\'s LMS, their email or phone number needs an update, a wrong name is listed in the LMS, or the LMS shows the wrong status for the child.',
+                        keywords: ['student information missing', 'incorrect info', 'wrong name', 'update email', 'wrong status'],
+                        to: 'Ushma',
+                        toEmails: 'ushma@example.com',
+                        cc: 'MIS, Roshan, Lead',
+                        ccEmails: 'mis@example.com,roshan@example.com,lead@example.com',
+                        draftMessage: `Hi Ushma,
+
+I'm facing an issue with the LMS in my batch [Batch ID] regarding [Student Name] [Student ID]. [Describe the issue, e.g., "The student's name is incorrect in the LMS," "I need to update their email address," "The batch status is incorrect."].
+
+Could you please correct this?
+
+Thanks.`
+                    },
+                    {
+                        id: 'student-joins-direct-link',
+                        title: 'Student joins from a direct link',
+                        description: 'A student is joining from a direct link or is not able to log in and does not know their credentials.',
+                        keywords: ['direct link', 'login issue', 'credentials', 'lms access'],
+                        to: 'Akash Chaudhary or Jyoti',
+                        toEmails: 'akashchaudhary@example.com,jyoti@example.com',
+                        cc: 'Lead, cc-team@moonpreneur.com',
+                        ccEmails: 'lead@example.com,ccteam@moonpreneur.com',
+                        draftMessage: `Hi [Akash Chaudhary or Jyoti Name],
+
+This is regarding [Student Name] [Student ID] from batch [Batch ID]. The student is unable to log in and does not know their credentials.
+
+Could you please assist with this?
+
+Thanks.`
+                    },
+                    {
+                        id: 'student-help-lms-navigation',
+                        title: 'Students need help with LMS navigation',
+                        description: 'A student is facing difficulty navigating the LMS like finding assignments or introduction files, etc.',
+                        keywords: ['lms navigation', 'finding assignments', 'lms difficulty'],
+                        to: 'Akash Chaudhary or Jyoti',
+                        toEmails: 'akashchaudhary@example.com,jyoti@example.com',
+                        cc: 'Lead, cc-team@moonpreneur.com',
+                        ccEmails: 'lead@example.com,ccteam@moonpreneur.com',
+                        draftMessage: `Hi [Akash Chaudhary or Jyoti Name],
+
+A student[student name] [Student ID] from my batch [Batch ID] is facing difficulty navigating the LMS.
+
+Could you please reach out to the customer and help them out?
+
+Thanks.`
+                    },
+                    {
+                        id: 'student-misalignment',
+                        title: 'Student Misalignment',
+                        description: 'A student has been placed in the wrong tier, is misaligned after coming from a pause (wrong tier/wrong session number), or needs a downgrade/upgrade. The above points are also valid for upsell-related cases.',
+                        keywords: ['student misalignment', 'wrong tier', 'wrong session', 'downgrade', 'upgrade'],
+                        to: 'Roshan',
+                        toEmails: 'roshan@example.com',
+                        cc: 'Lead, PM, SPM, Anurag',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com,anurag@example.com',
+                        draftMessage: `Hi Roshan,
+
+I believe [Student Name] [Student ID] is misaligned to my batch [Batch ID]. The student is currently in [describe their actual level/course] and should be in [mention the correct batch/level].
+
+Could you please rectify this?
+
+Thanks.`
+                    },
+                    {
+                        id: 'session-number-mismatch',
+                        title: 'Session Number Mismatch',
+                        description: 'The student is in the correct tier, but the wrong session number / All of a sudden your session count doesn\'t match with the topic that you are teaching. Note: Please mention the correct session number for the next class and ask the team to do the corrections. PG to email the assignments to the customer.',
+                        keywords: ['session number mismatch', 'wrong session', 'session count'],
+                        to: 'Ushma',
+                        toEmails: 'ushma@example.com',
+                        cc: 'Lead, PM, MISOPS alias, Roshan',
+                        ccEmails: 'lead@example.com,pm@example.com,misops@example.com,roshan@example.com',
+                        draftMessage: `Hi Ushma,
+
+I have a session number mismatch issue in my batch [Batch ID]. The current session number in the LMS is [current session number], but it should be [correct session number].
+
+Could you please correct this?
+
+Thanks.`
+                    },
+                    {
+                        id: 'removal-of-substitution-batches',
+                        title: 'Removal of substitution batches',
+                        description: 'After the substitution sessions are done and you want to clear your dashboard',
+                        keywords: ['remove batches', 'substitution', 'clear dashboard'],
+                        to: 'MISops',
+                        toEmails: 'misops@example.com',
+                        cc: 'Ushma, Lead',
+                        ccEmails: 'ushma@example.com,lead@example.com',
+                        draftMessage: `Hi MIS team,
+
+Kindly remove the following substitution batches from my dashboard. [Batch IDs]
+
+Thanks.`
+                    },
+                    {
+                        id: 'recording-upload-issues',
+                        title: 'Recording Upload Issues',
+                        description: 'The recording is not being uploaded in the batch. Note: Ask the PG if he/she has checked the "Recording upload" in the recordings, and if it is still not working, send a mail to the support team.',
+                        keywords: ['recording upload', 'not uploaded', 'lms recording', 'support team'],
+                        to: 'Tulsi',
+                        toEmails: 'tulsi@example.com',
+                        cc: 'MISOPS Alias, Lead',
+                        ccEmails: 'misops@example.com,lead@example.com',
+                        draftMessage: `Hi Tulsi,
+
+The recording for my batch [Batch ID] session [session number] is not visible on the LMS. I have tried to [mention steps taken, e.g., "re-sync the recording"].
+
+Could you please look into this and ensure the recording is uploaded?
+
+Thanks.`
+                    },
+                    {
+                        id: 'session-recording-trimming-requests',
+                        title: 'Session Recording Trimming Requests',
+                        description: 'Request to trim a session recording.',
+                        keywords: ['session recording', 'trimming', 'edit recording'],
+                        to: 'Sessionreview alias',
+                        toEmails: 'sessionreview@example.com',
+                        cc: 'Tulsi, Lead, PM, SPM',
+                        ccEmails: 'tulsi@example.com,lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi Sessionreview team,
+
+Could you please trim the recording for batch [Batch ID], session [session number]? I need to trim the section from [timestamp start] to [timestamp end][Mention the reason].
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Batch Merge',
+                borderColor: '#FDE68A', // Yellow
+                incidents: [
+                    {
+                        id: 'batch-merge-requests',
+                        title: 'Batch Merge Requests',
+                        description: 'In the case of a single student left in a batch.',
+                        keywords: ['batch merge', 'single student'],
+                        to: 'Roshan',
+                        toEmails: 'roshan@example.com',
+                        cc: 'Lead, PM, SPM, Anurag',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com,anurag@example.com',
+                        draftMessage: `Hi Roshan,
+
+I would like to request a batch merge for my batch [Batch ID] as there is only one active student[student name][student ID] left in this batch.
+
+Could you please look into this and take the necessary action?
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Leave Management',
+                borderColor: '#EC4899', // Pink
+                incidents: [
+                    {
+                        id: 'regular-leave',
+                        title: 'Regular Leave',
+                        description: 'A PG wants to apply and seek approval for leaves, information about the substitution batches, an extension of leave, or emails regarding LOPs and exams (datesheets).',
+                        keywords: ['regular leave', 'apply leave', 'substitution', 'lop', 'exams'],
+                        to: 'Substitution alias',
+                        toEmails: 'substitution@example.com',
+                        cc: 'SPM, PM, Lead, Anurag',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,anurag@example.com',
+                        draftMessage: `Hi Substitution team,
+
+I would like to request leave on [Mention date range]. [Provide the reason for the leave]. [Mention the specific details of all the batches that fall within that duration, along with batch IDs, and mention if a student is slow or fast any facing any concern, like doesn’t have a kit, etc.].
+
+Thanks.`
+                    },
+                    {
+                        id: 'maternity-paternity-leave',
+                        title: 'Maternity/Paternity Leave',
+                        description: 'Maternity/Paternity leave.',
+                        keywords: ['maternity leave', 'paternity leave', 'long leave'],
+                        to: 'Prachi, Simardeep',
+                        toEmails: 'prachi@example.com,simardeep@example.com',
+                        cc: 'SPM, PM, Lead, Anurag, substitution alias',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,anurag@example.com,substitution@example.com',
+                        draftMessage: `Hi [Prachi/Simardeep Name],
+
+I would like to request maternity/paternity leave starting on [date].
+
+Please let me know the next steps.
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Absenteeism',
+                borderColor: '#DC2626', // A darker red
+                incidents: [
+                    {
+                        id: 'absenteeism-protocol',
+                        title: 'Absenteeism Protocol',
+                        description: 'Protocol to follow for student absenteeism. For sessions 1 to 5, no emails for absenteeism. After session 5, if only one session is missed, no action is required. If 2 consecutive sessions are missed (e.g., 6 & 7), a ticket should be raised on the LMS. The follow-up frequency is every alternate day before the 3rd missed session, 2 follow-ups if the 3rd session is missed (Session 8), and 1 follow-up if the 4th session is missed (Session 9). After that, no further follow-ups are needed, and it should be escalated to the PM. Note: The ticket should be assigned to Armughan Qazi if your SPM is ANITA and Nishant Vijayvargiya if your SPM is Akshay Tambe.',
+                        keywords: ['absenteeism protocol', 'absent', 'missed sessions', 'escalation', 'follow-up'],
+                        to: 'PM',
+                        toEmails: 'pm@example.com',
+                        cc: '',
+                        ccEmails: '',
+                        draftMessage: `Hi [PM Name],
+
+Student [Student Name] [Student ID] from batch [Batch ID] has been absent for [number] consecutive sessions. I have followed the absenteeism protocol and now need to escalate this. The student's SPM is [SPM Name].
+
+Could you please follow up with the parent to find out the reason for absenteeism?
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Unknown Session Queries',
+                borderColor: '#2DD4BF', // Teal
+                incidents: [
+                    {
+                        id: 'unknown-session-queries',
+                        title: 'Unknown Session Queries',
+                        description: 'A customer discusses unfamiliar topics in a session such as Summer camp, Moonbattle, MoonCampaingns Maths, or a different program (other than Robotics).',
+                        keywords: ['unknown session', 'unfamiliar topics', 'summer camp', 'moonbattle', 'mooncampaings'],
+                        to: 'Jyoti, Akash chaudhary',
+                        toEmails: 'jyoti@example.com,akashchaudhary@example.com',
+                        cc: 'cc-team alias, PM, SPM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,spm@example.com,lead@example.com',
+                        draftMessage: `Hi [Jyoti/Akash Chaudhary Name],
+
+Parent of [student ID] [student name] is asking about [briefly state the parent's query, e.g., "Summer camp," "Moonbattle," etc.].
+
+Could you please reach out to them and provide some clarity on this?
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Incident Reporting',
+                borderColor: '#6B7280', // Gray
+                incidents: [
+                    {
+                        id: 'incident-reporting',
+                        title: 'Incident Reporting',
+                        description: 'To report an incident in class in case you are not sure how to react or respond to that case.',
+                        keywords: ['incident reporting', 'report incident', 'how to respond', 'not sure'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM, Anurag, session review alias',
+                        ccEmails: 'lead@example.com,pm@example.com,anurag@example.com,sessionreview@example.com',
+                        draftMessage: `Hi [SPM Name],
+
+An incident has occurred in my batch [Batch ID] involving [Student Name] [Student ID]. [Provide a detailed description of the incident]. I am not sure how to handle this.
+
+Could you please guide me on the next steps?
+
+Thanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Show and Tell Information',
+                borderColor: '#10B981', // Green
+                incidents: [
+                    {
+                        id: 'show-and-tell-information',
+                        title: 'Show and Tell Information',
+                        description: 'Show and tell good performances or edit in the Mooncampaigns.',
+                        keywords: ['show and tell', 'good performance', 'mooncampaigns', 'edit'],
+                        to: 'Riti',
+                        toEmails: 'riti@example.com',
+                        cc: 'cc-team, PM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,lead@example.com',
+                        draftMessage: `Hi Riti,
+
+In the recent 'Show and Tell' session for my batch [Batch ID], the student [student name][student ID] performed really well, you might want to have a look at this.
+
+Thanks.`
+                    }
+                ]
             }
         ];
-        // === END OF EDITABLE SECTION ===
         
-        const incidentsContainer = document.getElementById('incidentsContainer');
+        const mainContent = document.getElementById('main-content');
         const incidentSearch = document.getElementById('incidentSearch');
         const searchLoading = document.getElementById('searchLoading');
         const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
         const sidebarMenu = document.getElementById('sidebar-menu');
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('main-content');
         let currentExpandedCategory = null;
 
-        // Debounce function to prevent excessive API calls
+        const synonymMap = {
+            'not interested to continue': 'upsell parent concern',
+            'broken component': 'component not working',
+            'damaged component': 'component not working',
+            'missing component': 'components missing unboxing',
+            'lost component': 'lost the components',
+            'absent student': 'absenteeism',
+            'parent wants to cancel': 'upsell parent concern',
+            'student having problems': 'fast slow pace',
+            'wrong kit sent': 'wrong kit/address/duplicate kits',
+            'kit not delivered': 'shipment issues (entire kit)',
+            'payment issue with kit': 'kit on hold due to payment issues',
+            'wrong address for kit': 'wrong kit/address/duplicate kits',
+            'student is not understanding': 'fast slow pace',
+            'component issues': 'component not working',
+        };
+
+        const spellingMap = {
+            'brokne': 'broken',
+            'componet': 'component',
+            'prants': 'parents',
+            'adress': 'address',
+            'shipent': 'shipment',
+            'reccords': 'records',
+            'unbocing': 'unboxing'
+        };
+        
         const debounce = (func, delay) => {
             let timeout;
             return function(...args) {
@@ -724,58 +1056,93 @@ Thanks.`
             };
         };
         
-        // This is the new, self-contained search logic
+        const calculateSimilarity = (word1, word2) => {
+            const longer = word1.length > word2.length ? word1 : word2;
+            const shorter = word1.length > word2.length ? word2 : word1;
+            const longerLength = longer.length;
+            if (longerLength === 0) {
+                return 1.0;
+            }
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        };
+
+        const editDistance = (word1, word2) => {
+            word1 = word1.toLowerCase();
+            word2 = word2.toLowerCase();
+            const costs = [];
+            for (let i = 0; i <= word1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= word2.length; j++) {
+                    if (i === 0) {
+                        costs[j] = j;
+                    } else if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (word1.charAt(i - 1) !== word2.charAt(j - 1)) {
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        }
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+                if (i > 0) {
+                    costs[word2.length] = lastValue;
+                }
+            }
+            return costs[word2.length];
+        };
+
         const performLocalSearch = (searchTerm) => {
             const allIncidents = incidentsData.flatMap(cat => cat.incidents.map(inc => ({ ...inc, category: cat.category, borderColor: cat.borderColor })));
-            const matchedIncidents = [];
             
-            // Normalize the search term by removing common words and breaking into key terms
-            const stopWords = new Set(['my', 'a', 'an', 'the', 'is', 'i', 'of', 'for', 'in', 'and', 'was', 'not', 'able', 'to', 'find', 'his', 'it', 'with', 'from', 'her', 'child', 'new', 'said', 'that', 'understanding', 'anything', 'continue']);
-            const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => !stopWords.has(term) && term.length > 2);
+            const normalizedSearchTerm = searchTerm.toLowerCase();
+            let finalSearchTerms = [];
             
-            // If the search term is empty, return all incidents
-            if (searchTerms.length === 0) {
-                 return allIncidents.map(inc => ({...inc, score: 0}));
+            if (synonymMap[normalizedSearchTerm]) {
+                finalSearchTerms = Array.isArray(synonymMap[normalizedSearchTerm]) ? synonymMap[normalizedSearchTerm] : [synonymMap[normalizedSearchTerm]];
+            } else {
+                 const stopWords = new Set(['my', 'a', 'an', 'the', 'is', 'i', 'of', 'for', 'in', 'and', 'was', 'not', 'able', 'to', 'find', 'his', 'it', 'with', 'from', 'her', 'child', 'new']);
+                 const individualSearchTerms = normalizedSearchTerm.split(' ').filter(term => !stopWords.has(term) && term.length > 2);
+                 
+                 finalSearchTerms = individualSearchTerms.flatMap(term => {
+                    let correctedTerm = term;
+                    let bestMatchScore = 0;
+                    for (const officialTerm of Object.keys(spellingMap)) {
+                        const similarity = calculateSimilarity(term, officialTerm);
+                        if (similarity > bestMatchScore) {
+                            bestMatchScore = similarity;
+                            correctedTerm = officialTerm;
+                        }
+                    }
+                    if (bestMatchScore > 0.7) {
+                        return [spellingMap[correctedTerm]];
+                    }
+                    return [term];
+                 });
             }
             
-            // Calculate a relevance score for each incident
-            allIncidents.forEach(incident => {
+            if (finalSearchTerms.length === 0) {
+                return [];
+            }
+            
+            const scoredIncidents = allIncidents.map(incident => {
                 let score = 0;
                 const searchString = `${incident.title.toLowerCase()} ${incident.description.toLowerCase()} ${incident.keywords.join(' ').toLowerCase()}`;
                 
-                searchTerms.forEach(term => {
+                finalSearchTerms.forEach(term => {
                     if (searchString.includes(term)) {
                         score++;
                     }
                 });
-                
-                if (score > 0) {
-                    matchedIncidents.push({ ...incident, score });
-                }
+                return { ...incident, score };
             });
             
-            // Sort by score in descending order
-            matchedIncidents.sort((a, b) => b.score - a.score);
-
-            // Filter out results with a score of 1 if there are multiple results
-            // This prioritizes more specific matches over single-word matches.
-            const filteredResults = matchedIncidents.filter(inc => {
-                const queryWords = searchTerms.length;
-                if (queryWords > 1) {
-                    return inc.score >= 2;
-                } else {
-                    return inc.score >= 1;
-                }
-            });
+            const filteredResults = scoredIncidents.filter(inc => inc.score > 0);
             
-            // Return filtered results
+            filteredResults.sort((a, b) => b.score - a.score);
+            
             return filteredResults;
         };
 
-        /**
-         * Copies text to the clipboard and shows a confirmation message.
-         * @param {string} text - The text to copy.
-         */
         const copyToClipboard = (text) => {
             const textarea = document.createElement('textarea');
             textarea.value = text;
@@ -792,23 +1159,11 @@ Thanks.`
             }, 2500);
         };
 
-        /**
-         * Composes a new Gmail email with pre-filled fields.
-         * @param {string} to - The 'To' recipient(s).
-         * @param {string} cc - The 'CC' recipient(s).
-         * @param {string} subject - The email subject.
-         * @param {string} body - The email body text.
-         */
         const composeEmail = (to, cc, subject, body) => {
             const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&cc=${encodeURIComponent(cc)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(mailtoLink, '_blank');
         };
 
-        /**
-         * Function to create a collapsed category card.
-         * @param {Object} categoryData - The category data object.
-         * @returns {HTMLElement} The created category card button element.
-         */
         const createCategoryCardButton = (categoryData) => {
             const cardButton = document.createElement('div');
             cardButton.classList.add('category-card-button', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'flex', 'items-center', 'justify-between');
@@ -826,18 +1181,12 @@ Thanks.`
             return cardButton;
         };
         
-        /**
-         * Function to create an incident card element.
-         * @param {Object} incident - The incident data object.
-         * @returns {HTMLElement} The created card element.
-         */
         const createIncidentCard = (incident, categoryBorderColor) => {
             const card = document.createElement('div');
             card.classList.add('incident-card', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg');
             card.setAttribute('data-search-terms', `${incident.title} ${incident.description} ${incident.to} ${incident.cc}`.toLowerCase());
             card.setAttribute('data-incident-id', incident.id);
             
-            // Set the border color based on the category's `borderColor` property
             if (categoryBorderColor) {
                 card.style.borderLeftColor = categoryBorderColor;
             }
@@ -861,11 +1210,9 @@ Thanks.`
                 </div>
             `;
 
-            // Get the buttons and add event listeners
             const copyButton = card.querySelector('.copy-btn');
             const emailButton = card.querySelector('.email-btn');
             
-            // Build the subject line with a placeholder
             const subjectLine = `${incident.title}: [batch ID]`;
 
             copyButton.addEventListener('click', () => copyToClipboard(incident.draftMessage));
@@ -875,6 +1222,7 @@ Thanks.`
         };
 
         const renderSidebarMenu = () => {
+            const sidebarMenu = document.getElementById('sidebar-menu');
             sidebarMenu.innerHTML = '';
             incidentsData.forEach(categoryData => {
                 const li = document.createElement('li');
@@ -884,51 +1232,47 @@ Thanks.`
                 
                 li.addEventListener('click', (e) => {
                     e.preventDefault();
-                    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-                    // Close the sidebar after clicking on a link
+                    const targetElement = document.getElementById(id);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
                     sidebar.classList.remove('open');
                     document.body.style.paddingLeft = '0';
                 });
             });
         };
 
-        /**
-         * Renders all incident cards to the container, grouped by category.
-         */
         const renderIncidents = (filteredIncidents = null) => {
             const allIncidents = filteredIncidents ? filteredIncidents : incidentsData;
             
+            const incidentsContainer = document.getElementById('incidentsContainer');
             incidentsContainer.innerHTML = '';
             
             allIncidents.forEach(categoryData => {
-                // Create a wrapper for each category and its cards
                 const categoryWrapper = document.createElement('div');
-                categoryWrapper.classList.add('category-wrapper');
+                categoryWrapper.classList.add('category-container', 'mb-8');
                 categoryWrapper.id = categoryData.category.toLowerCase().replace(' ', '-');
 
-                // Create the category button and add its border color
                 const categoryCardButton = createCategoryCardButton(categoryData);
                 categoryCardButton.style.borderColor = categoryData.borderColor;
-                categoryWrapper.appendChild(categoryCardButton);
-
-                // Create the hidden container for incident cards for this category
+                
                 const cardsContainer = document.createElement('div');
                 cardsContainer.classList.add('cards-container', 'p-6', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
                 cardsContainer.style.display = 'none';
                 cardsContainer.setAttribute('data-category', categoryData.category.toLowerCase().replace(' ', '-'));
-
+                
                 categoryData.incidents.forEach(incident => {
                     const card = createIncidentCard(incident, categoryData.borderColor);
                     cardsContainer.appendChild(card);
                 });
 
+                categoryWrapper.appendChild(categoryCardButton);
                 categoryWrapper.appendChild(cardsContainer);
                 incidentsContainer.appendChild(categoryWrapper);
 
                 categoryCardButton.addEventListener('click', () => {
                     const isOpen = cardsContainer.style.display === 'grid';
                     
-                    // Close all other open categories
                     document.querySelectorAll('.cards-container').forEach(container => {
                         container.style.display = 'none';
                     });
@@ -940,14 +1284,12 @@ Thanks.`
                         button.classList.remove('faded-category');
                     });
 
-                    // Toggle the clicked category
                     if (!isOpen) {
                         cardsContainer.style.display = 'grid';
                         categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
                         categoryCardButton.classList.add('highlighted-category');
                         categoryCardButton.style.borderColor = categoryData.borderColor;
 
-                        // Fade other categories
                         document.querySelectorAll('.category-card-button').forEach(button => {
                             if (button !== categoryCardButton) {
                                 button.classList.add('faded-category');
@@ -962,6 +1304,7 @@ Thanks.`
         };
         
         const handleSearch = (searchTerm) => {
+            const searchLoading = document.getElementById('searchLoading');
             searchLoading.classList.remove('hidden');
 
             if (searchTerm === '') {
@@ -979,7 +1322,6 @@ Thanks.`
                 const category = incidentsData.find(cat => cat.incidents.some(inc => inc.id === incident.id));
                 if (category && !processedCategories.has(category.category)) {
                     const matchedCategoryIncidents = category.incidents.filter(inc => matchedIncidents.some(mInc => mInc.id === inc.id));
-                    // Sort incidents within the category by the search score
                     matchedCategoryIncidents.sort((a,b) => {
                         const scoreA = matchedIncidents.find(inc => inc.id === a.id).score;
                         const scoreB = matchedIncidents.find(inc => inc.id === b.id).score;
@@ -1000,33 +1342,10 @@ Thanks.`
                  const noResultsMessage = document.createElement('p');
                  noResultsMessage.classList.add('text-center', 'text-gray-500', 'mt-10');
                  noResultsMessage.textContent = 'No matching incidents found. Please try a different query.';
+                 const incidentsContainer = document.getElementById('incidentsContainer');
                  incidentsContainer.innerHTML = '';
                  incidentsContainer.appendChild(noResultsMessage);
             }
-
-            const categoryButtons = document.querySelectorAll('.category-card-button');
-            const allCategories = incidentsData.map(cat => cat.category.toLowerCase().replace(' ', '-'));
-            const matchedCategoryNames = matchedData.map(cat => cat.category.toLowerCase().replace(' ', '-'));
-
-            categoryButtons.forEach(button => {
-                const categoryName = button.getAttribute('data-category');
-                if (matchedCategoryNames.includes(categoryName)) {
-                     button.classList.add('highlighted-category');
-                     button.querySelector('.caret-icon').classList.add('rotate');
-                } else {
-                    if (allCategories.includes(categoryName)) {
-                       button.classList.add('faded-category');
-                    }
-                }
-            });
-
-            const allCardsContainers = document.querySelectorAll('.cards-container');
-            allCardsContainers.forEach(container => {
-                const categoryName = container.getAttribute('data-category');
-                 if (matchedCategoryNames.includes(categoryName)) {
-                    container.style.display = 'grid';
-                }
-            });
         };
         
         const debouncedHandleSearch = debounce(handleSearch, 500);
@@ -1040,10 +1359,9 @@ Thanks.`
         });
         
         const toggleScrollButtons = () => {
-            const isAtTop = document.documentElement.scrollTop <= 100;
-            const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 100;
+            const isAtTop = document.documentElement.scrollTop === 0;
+            const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight;
 
-            // Toggle scroll to top button
             if (isAtTop) {
                 scrollToTopBtn.style.opacity = '0';
                 scrollToTopBtn.classList.add('hidden');
@@ -1052,7 +1370,6 @@ Thanks.`
                 scrollToTopBtn.classList.remove('hidden');
             }
 
-            // Toggle scroll to bottom button
             if (isAtBottom) {
                 scrollToBottomBtn.style.opacity = '0';
                 scrollToBottomBtn.classList.add('hidden');
@@ -1077,7 +1394,6 @@ Thanks.`
             });
         });
 
-        // Hamburger menu logic
         hamburgerBtn.addEventListener('click', () => {
             sidebar.classList.toggle('open');
             if (sidebar.classList.contains('open')) {
@@ -1087,7 +1403,6 @@ Thanks.`
             }
         });
 
-        // Initial render of all incidents on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderIncidents();
             renderSidebarMenu();
