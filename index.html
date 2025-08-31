@@ -23,30 +23,6 @@
             transform: translateY(-5px);
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
         }
-        .email-button {
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
-        }
-        .email-button:hover {
-            background-color: #dc2626;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        .copy-btn {
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
-        }
-        .copy-btn:hover {
-            background-color: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        .search-icon {
-            filter: grayscale(100%);
-            transition: filter 0.2s, color 0.2s;
-        }
-        .search-icon:hover {
-            filter: grayscale(0%);
-            color: #3b82f6;
-        }
         .category-card-button {
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
@@ -69,25 +45,6 @@
                 box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
             }
         }
-        .caret-icon {
-            transition: transform 0.3s ease;
-        }
-        .caret-icon.rotate {
-            transform: rotate(90deg);
-        }
-        /* New styles for highlighting and fading */
-        .faded-category {
-            opacity: 0.6;
-        }
-        .highlighted-category {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            transform: translateY(-5px);
-            border: 2px solid #3b82f6;
-            animation: none;
-        }
-        .highlighted-category:hover {
-             transform: translateY(-5px); /* Maintain the lift */
-        }
         .search-loading {
             position: absolute;
             left: 50%;
@@ -102,79 +59,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        /* Scroll to bottom button styling */
-        #scrollToBottomBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #3b82f6;
-            color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: opacity 0.3s ease;
-            z-index: 100;
-        }
-        
-        /* Scroll to top button styling */
-        #scrollToTopBtn {
-            position: fixed;
-            bottom: 80px; /* Position it above the scroll to bottom button */
-            right: 20px;
-            background-color: #3b82f6;
-            color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: opacity 0.3s ease;
-            z-index: 100;
-        }
-        
-        /* New sidebar styling */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -200px; /* Hidden by default */
-            width: 200px;
-            height: 100%;
-            background-color: white;
-            padding: 1.5rem;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-            overflow-y: auto;
-            transition: left 0.3s ease-in-out;
-            z-index: 100;
-        }
-        .sidebar.open {
-            left: 0;
-        }
-        .sidebar-link {
-            transition: background-color 0.2s ease;
-        }
-        .sidebar-link:hover {
-            background-color: #e2e8f0;
-        }
-        .hamburger-menu {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 101;
-            cursor: pointer;
-            padding: 0.5rem;
-            background-color: white;
-            border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -204,7 +88,7 @@
         <!-- Search bar -->
         <div class="mb-10 flex justify-center">
             <div class="relative w-full max-w-2xl">
-                <input type="text" id="incidentSearch" placeholder="AI Search..." class="w-full pl-12 pr-4 py-3 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-md text-lg">
+                <input type="text" id="incidentSearch" placeholder="Smart Search..." class="w-full pl-12 pr-4 py-3 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-md text-lg">
                 <div id="searchLoading" class="search-loading hidden">
                     <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.418 10h.582M18 10c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zm0 0v14" />
@@ -216,12 +100,9 @@
             </div>
         </div>
 
-        <!-- Search Results Container -->
-        <div id="searchResults" class="mt-6"></div>
-
         <!-- Main content for rendering categories and cards -->
         <div id="incidentsContainer" class="space-y-8">
-            <!-- All content will be dynamically generated here -->
+            <!-- Categories and Incident Cards will be rendered here -->
         </div>
 
     </div>
@@ -247,11 +128,15 @@
 
     <script>
         // === API and New Search Code ===
-        const apiKey = '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';  // Replace with your API Key
+        const apiKey = 'your-openai-api-key';  // Replace with your API Key
         const incidentSearch = document.getElementById('incidentSearch');
         const searchLoading = document.getElementById('searchLoading');
         const searchResults = document.getElementById('searchResults');
+        const incidentsData = [
+            // Your incidents data here, e.g., categories and incidents
+        ];
 
+        // AI-powered Search Call to OpenAI API
         const performAICall = async (query) => {
             try {
                 searchLoading.classList.remove('hidden');
@@ -281,6 +166,7 @@
             }
         };
 
+        // Displaying Search Results
         const displaySearchResults = (results) => {
             searchResults.innerHTML = '';
             const resultItems = results.split('\n').map(item => item.trim()).filter(item => item.length > 0);
@@ -296,6 +182,7 @@
             }
         };
 
+        // Handling Search Input and calling AI Search
         incidentSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
             if (searchTerm) {
@@ -303,6 +190,35 @@
             } else {
                 searchResults.innerHTML = '';
             }
+        });
+
+        // Initial Render of Categories and Cards
+        const renderIncidents = () => {
+            const incidentsContainer = document.getElementById('incidentsContainer');
+            incidentsContainer.innerHTML = '';
+
+            incidentsData.forEach(categoryData => {
+                const categoryWrapper = document.createElement('div');
+                categoryWrapper.classList.add('category-container', 'mb-8');
+                const categoryCardButton = document.createElement('div');
+                categoryCardButton.classList.add('category-card-button', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'flex', 'items-center', 'justify-between');
+                categoryCardButton.style.borderColor = categoryData.borderColor;
+                categoryCardButton.innerHTML = `
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold">${categoryData.category}</h2>
+                        <ul class="text-gray-600 text-sm mt-2 space-y-1">
+                            ${categoryData.incidents.map(inc => `<li>${inc.title}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <svg class="caret-icon w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                `;
+                incidentsContainer.appendChild(categoryWrapper);
+            });
+        };
+
+        // Call the render function on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIncidents();
         });
     </script>
 </body>
