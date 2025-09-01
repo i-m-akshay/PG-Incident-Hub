@@ -962,70 +962,187 @@
             }
         });
 
-        // AI search integration
-        const apiKey = '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';
-        async function performAISearch(query) {
-            const endpoint = 'https://api.openai.com/v1/completions';
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: 'text-davinci-003',
-                        prompt: `You are an assistant helping PGs search for incident management guidance. Use the following incident titles and descriptions to identify which incidents match the query. If multiple incidents match, list them separated by new lines with format "<Category>: <Title>". Here are the incidents: ${incidentsData.map(cat => cat.incidents.map(inc => `${cat.category}: ${inc.title} - ${inc.description}`).join('\n')).join('\n')}\n\nQuery: ${query}\n\nRelevant incidents:`,
-                        max_tokens: 150,
-                        temperature: 0.3
-                    })
-                });
-                const data = await response.json();
-                if (data.choices && data.choices.length > 0) {
-                    return data.choices[0].text.trim();
+        /*
+         * Local search implementation
+         * To provide search functionality without relying on external APIs, we implement
+         * a fuzzy local search. The search engine uses synonyms, spelling correction
+         * and a simple scoring mechanism to find relevant incidents when a user
+         * enters a query. This ensures the search feature works even if no AI
+         * service is available.
+         */
+
+        // Map of phrases or words to their canonical search terms. These help to
+        // interpret user queries that use different vocabulary to describe the
+        // same incident.
+        const synonymMap = {
+            'not interested to continue': 'upsell parent concern',
+            'broken component': 'component not working',
+            'damaged component': 'component not working',
+            'missing component': 'components missing during the kit unboxing session',
+            'lost component': 'lost the components',
+            'absent student': 'absenteeism protocol',
+            'parent wants to cancel': 'upsell parent concern',
+            'student having problems': 'fast/slow pace',
+            'wrong kit sent': 'wrong kit/address/duplicate kits',
+            'kit not delivered': 'shipment issues (entire kit)',
+            'payment issue with kit': 'kit on hold due to payment issues',
+            'wrong address for kit': 'wrong kit/address/duplicate kits',
+            'student is not understanding': 'fast/slow pace',
+            'component issues': 'component not working'
+        };
+
+        // Map of common misspellings to their correct form
+        const spellingMap = {
+            'brokne': 'broken',
+            'componet': 'component',
+            'prants': 'parents',
+            'adress': 'address',
+            'shipent': 'shipment',
+            'reccords': 'records',
+            'unbocing': 'unboxing'
+        };
+
+        // Stop words to ignore in search queries
+        const stopWords = new Set(['my', 'a', 'an', 'the', 'is', 'i', 'of', 'for', 'in', 'and', 'was', 'not', 'able', 'to', 'find', 'his', 'it', 'with', 'from', 'her', 'child', 'new']);
+
+        // Calculate the Levenshtein edit distance between two words
+        function editDistance(word1, word2) {
+            word1 = word1.toLowerCase();
+            word2 = word2.toLowerCase();
+            const costs = [];
+            for (let i = 0; i <= word1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= word2.length; j++) {
+                    if (i === 0) {
+                        costs[j] = j;
+                    } else if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (word1.charAt(i - 1) !== word2.charAt(j - 1)) {
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        }
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
                 }
-                return '';
-            } catch (error) {
-                console.error('AI search error:', error);
-                return '';
+                if (i > 0) {
+                    costs[word2.length] = lastValue;
+                }
             }
+            return costs[word2.length];
         }
 
-        // Display AI search results
-        function displaySearchResults(resultsText) {
-            const searchResultsContainer = document.getElementById('searchResults');
-            searchResultsContainer.innerHTML = '';
-            if (!resultsText) {
-                searchResultsContainer.innerHTML = '<p class="text-gray-500">No relevant incidents found. Please try a different query.</p>';
-                return;
+        // Calculate similarity between two words based on edit distance
+        function calculateSimilarity(word1, word2) {
+            const longer = word1.length > word2.length ? word1 : word2;
+            const shorter = word1.length > word2.length ? word2 : word1;
+            const longerLength = longer.length;
+            if (longerLength === 0) {
+                return 1.0;
             }
-            const lines = resultsText.split('\n').map(line => line.trim()).filter(line => line);
-            lines.forEach(line => {
-                const div = document.createElement('div');
-                div.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
-                div.textContent = line;
-                searchResultsContainer.appendChild(div);
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        }
+
+        // Perform a local search over all incidents, returning an array of
+        // matched incidents with additional score and category information.
+        function performLocalSearch(searchTerm) {
+            const allIncidents = incidentsData.flatMap(cat => cat.incidents.map(inc => ({ ...inc, category: cat.category, borderColor: cat.borderColor })));
+            const normalizedSearchTerm = searchTerm.toLowerCase();
+            let finalSearchTerms = [];
+            // Check if the entire searchTerm corresponds to a synonym
+            if (synonymMap[normalizedSearchTerm]) {
+                const mapped = synonymMap[normalizedSearchTerm];
+                finalSearchTerms = Array.isArray(mapped) ? mapped : [mapped];
+            } else {
+                // Split into individual words, filter out stop words and short tokens
+                const terms = normalizedSearchTerm.split(' ').filter(term => !stopWords.has(term) && term.length > 1);
+                finalSearchTerms = terms.map(term => {
+                    // Correct misspellings based on spellingMap using similarity
+                    let corrected = term;
+                    let bestScore = 0;
+                    for (const misspelling in spellingMap) {
+                        const sim = calculateSimilarity(term, misspelling);
+                        if (sim > bestScore) {
+                            bestScore = sim;
+                            corrected = misspelling;
+                        }
+                    }
+                    if (bestScore > 0.7) {
+                        return spellingMap[corrected];
+                    }
+                    return term;
+                });
+            }
+            if (finalSearchTerms.length === 0) {
+                return [];
+            }
+            // Score incidents based on occurrence of search terms
+            const scoredIncidents = allIncidents.map(incident => {
+                let score = 0;
+                const searchString = `${incident.title.toLowerCase()} ${incident.description.toLowerCase()} ${incident.keywords.join(' ').toLowerCase()}`;
+                finalSearchTerms.forEach(term => {
+                    if (searchString.includes(term)) {
+                        score++;
+                    }
+                });
+                return { ...incident, score };
             });
+            // Filter to keep incidents with a positive score
+            const filtered = scoredIncidents.filter(inc => inc.score > 0);
+            // Sort by score descending
+            filtered.sort((a, b) => b.score - a.score);
+            return filtered;
         }
 
-        // Handle search input and call AI
+        // Handle search input and perform local search. If the search box is empty
+        // restore the full list of incidents. Otherwise, compute the matches
+        // locally using the performLocalSearch function. This ensures that PGs
+        // receive search results even when an external API is unavailable.
         const searchInput = document.getElementById('incidentSearch');
-        searchInput.addEventListener('input', async (e) => {
+        searchInput.addEventListener('input', (e) => {
             const term = e.target.value.trim();
             const searchResultsContainer = document.getElementById('searchResults');
+            const incidentsContainer = document.getElementById('incidentsContainer');
+            // When search is cleared, reset to default view
             if (term === '') {
                 searchResultsContainer.innerHTML = '';
                 renderIncidents();
                 return;
             }
-            // Hide category view while searching
-            document.getElementById('incidentsContainer').innerHTML = '';
+            // Remove existing content while searching
+            incidentsContainer.innerHTML = '';
             searchResultsContainer.innerHTML = '';
-            // Show loading spinner
-            searchLoading.classList.remove('hidden');
-            const results = await performAISearch(term);
-            searchLoading.classList.add('hidden');
-            displaySearchResults(results);
+            // Perform local search for matches
+            const matched = performLocalSearch(term);
+            if (matched.length === 0) {
+                searchResultsContainer.innerHTML = '<p class="text-gray-500">No relevant incidents found. Please try a different query.</p>';
+                return;
+            }
+            // Group matched incidents by category and prepare data structure
+            const processed = [];
+            const seenCategories = new Set();
+            matched.forEach(result => {
+                if (!seenCategories.has(result.category)) {
+                    // Collect all incidents in this category that appear in the matched list
+                    const incidentsInCategory = matched.filter(m => m.category === result.category).map(m => {
+                        const { score, category, borderColor, ...rest } = m;
+                        return rest;
+                    });
+                    // Sort incidents in this category by their individual score
+                    incidentsInCategory.sort((a, b) => {
+                        const scoreA = matched.find(m => m.id === a.id).score;
+                        const scoreB = matched.find(m => m.id === b.id).score;
+                        return scoreB - scoreA;
+                    });
+                    processed.push({
+                        category: result.category,
+                        borderColor: result.borderColor,
+                        incidents: incidentsInCategory
+                    });
+                    seenCategories.add(result.category);
+                }
+            });
+            // Render filtered categories and incidents
+            renderIncidents(processed);
         });
 
         // Initial render on DOM load
