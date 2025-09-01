@@ -1,151 +1,1039 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PG Incident Hub</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PG Incident Management</title>
+    <!-- Tailwind CSS CDN for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #2d3748;
+            padding-left: 0;
+            transition: padding-left 0.3s ease-in-out;
+        }
+        .incident-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border-left: 6px solid;
+        }
+        .incident-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+        }
+        .email-button {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+        }
+        .email-button:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .copy-btn {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+        }
+        .copy-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .search-icon {
+            filter: grayscale(100%);
+            transition: filter 0.2s, color 0.2s;
+        }
+        .search-icon:hover {
+            filter: grayscale(0%);
+            color: #3b82f6;
+        }
+        .category-card-button {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid;
+        }
+        .category-card-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+            }
+            50% {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+            }
+        }
+        .caret-icon {
+            transition: transform 0.3s ease;
+        }
+        .caret-icon.rotate {
+            transform: rotate(90deg);
+        }
+        /* New styles for highlighting and fading */
+        .faded-category {
+            opacity: 0.6;
+        }
+        .highlighted-category {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+            border: 2px solid #3b82f6;
+            animation: none;
+        }
+        .highlighted-category:hover {
+            transform: translateY(-5px); /* Maintain the lift */
+        }
+        .search-loading {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+        }
+        .search-loading svg {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scroll to bottom button styling */
+        #scrollToBottomBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #3b82f6;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        
+        /* Scroll to top button styling */
+        #scrollToTopBtn {
+            position: fixed;
+            bottom: 80px; /* Position it above the scroll to bottom button */
+            right: 20px;
+            background-color: #3b82f6;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        
+        /* New sidebar styling */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -200px; /* Hidden by default */
+            width: 200px;
+            height: 100%;
+            background-color: white;
+            padding: 1.5rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            transition: left 0.3s ease-in-out;
+            z-index: 100;
+        }
+        .sidebar.open {
+            left: 0;
+        }
+        .sidebar-link {
+            transition: background-color 0.2s ease;
+        }
+        .sidebar-link:hover {
+            background-color: #e2e8f0;
+        }
+        .hamburger-menu {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 101;
+            cursor: pointer;
+            padding: 0.5rem;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
-  <header class="bg-blue-600 text-white p-4 shadow">
-    <h1 class="text-2xl font-bold">PG Incident Hub</h1>
-  </header>
-
-  <main class="flex-1 container mx-auto p-4">
-    <div class="flex">
-      <!-- Sidebar -->
-      <aside class="w-64 bg-white rounded-xl shadow p-4 hidden md:block">
-        <h2 class="text-lg font-semibold mb-2">Categories</h2>
-        <ul id="sidebarCategories" class="space-y-2"></ul>
-      </aside>
-
-      <!-- Main Content -->
-      <section class="flex-1 md:ml-6">
-        <div id="incidentContainer" class="space-y-6"></div>
-      </section>
+<body class="p-6">
+    <!-- Hamburger menu icon -->
+    <div id="hamburger-btn" class="hamburger-menu hidden md:block">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
     </div>
-  </main>
 
-  <!-- Scroll buttons -->
-  <button id="scrollTopBtn" class="hidden fixed bottom-20 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg">↑</button>
-  <button id="scrollBottomBtn" class="hidden fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg">↓</button>
+    <!-- Left-hand navigation sidebar -->
+    <nav id="sidebar" class="sidebar hidden md:block">
+        <h2 class="text-2xl font-bold mb-4">Categories</h2>
+        <ul id="sidebar-menu" class="space-y-2">
+            <!-- Menu items will be generated here -->
+        </ul>
+    </nav>
+    
+    <div id="main-content" class="max-w-7xl mx-auto">
+        <!-- Header section with title and search bar -->
+        <header class="text-center mb-10">
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">PG Incident Hub</h1>
+            <p class="text-gray-500 text-lg">Your one-stop guide for handling all types of incidents.</p>
+        </header>
 
-  <!-- Success popup -->
-  <div id="copySuccess" class="hidden fixed bottom-28 right-4 bg-green-500 text-white px-4 py-2 rounded shadow">Copied!</div>
+        <!-- Search bar -->
+        <div class="mb-10 flex justify-center">
+            <div class="relative w-full max-w-2xl">
+                <input type="text" id="incidentSearch" placeholder="Search incidents..." class="w-full pl-12 pr-4 py-3 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-md text-lg">
+                <div id="searchLoading" class="search-loading hidden">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.418 10h.582M18 10c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zm0 0v14" />
+                    </svg>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
 
-  <script>
-    // Incident data
-    const incidentsData = {
-      "Upsell": [
-        {
-          title: "Tier Completion (after session 47)",
-          description: "Encourage parent to continue enrollment after 47th session.",
-          to: "support@example.com",
-          cc: "",
-          subject: "Tier Completion Guidance",
-          body: "Dear Parent, congratulations on reaching session 47..."
+        <!-- Container for search results -->
+        <div id="searchResults" class="space-y-8 mb-10"></div>
+
+        <!-- Main content area for rendering categories and cards -->
+        <div id="incidentsContainer" class="space-y-8">
+            <!-- All content will be dynamically generated here -->
+        </div>
+
+    </div>
+
+    <!-- Scroll to bottom button -->
+    <div id="scrollToBottomBtn" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+    </div>
+
+    <!-- Scroll to top button -->
+    <div id="scrollToTopBtn" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    </div>
+
+    <!-- Message box for copy confirmation -->
+    <div id="messageBox" class="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transform translate-y-full transition-all duration-500 z-50">
+        Message copied to clipboard!
+    </div>
+
+    <script>
+        // Data structure for categories and incidents
+        // Each category contains a border color and a list of incident objects.
+        // Incident objects define id, title, description, keywords, to, cc, and draftMessage.
+        const incidentsData = [
+            {
+                category: 'Upsell',
+                borderColor: '#48BB78', // Green
+                incidents: [
+                    {
+                        id: 'upsell-tier-completion',
+                        title: 'Tier Completion (after session 47)',
+                        description: 'When your batch is about to complete TIER (at session number 47)',
+                        keywords: ['upsell', 'tier', 'completion', 'session 47', 'batch complete', 'final session'],
+                        to: 'LTV Counsellor',
+                        toEmails: 'ltvcounselor@example.com',
+                        cc: 'LTV alias, Lead , preeti, akansha negi, PM, Roshan',
+                        ccEmails: 'ltvalias@example.com,lead@example.com,preeti@example.com,akansha.negi@example.com,pm@example.com,roshan@example.com',
+                        draftMessage: `Hi [LTV counselor name],\n\nThe [batch ID] batch requires an upsell. There are a total of [no. of students] students in this batch.\nCurrently, they are in [Tier, Stage, Session]. Please do the needful and let me know if you need any other information.\n\nBest regards,\n[PG's Name]`
+                    },
+                    {
+                        id: 'upsell-parent-concern',
+                        title: "Parents' concern after upsell",
+                        description: 'Parent expresses that the child is upsold in the wrong tier, has problems with the curriculum and syllabus. Expectation of the parents is not met in the upsold tier (might come up mid-tier as well), or in case of evaluation',
+                        keywords: ['parent', 'concern', 'upsell', 'wrong tier', 'curriculum', 'syllabus', 'evaluation', 'meeting', 'not interested', "don't want to continue", 'quit', 'discontinue'],
+                        to: 'PM, SPM',
+                        toEmails: 'pm@example.com,spm@example.com',
+                        cc: 'Lead, Anurag, Roshan',
+                        ccEmails: 'lead@example.com,anurag@example.com,roshan@example.com',
+                        draftMessage: `Hi [PM/SPM name],\n\nThe parent of the student [customer ID] [student name] in the batch [batch ID] joined the recent session to inform that [concern in brief with all the important details mentioned by the parent].\n\nPlease look into this.\n\nBest regards,\n[PG's Name]`
+                    },
+                    {
+                        id: 'upsell-absent-1-2',
+                        title: 'Absenteeism in upsell batch (sessions 1-2)',
+                        description: 'The student did not join for the first two sessions.',
+                        keywords: ['absent', 'absenteeism', 'upsell', 'sessions 1-2', 'missed class'],
+                        to: 'Counsellor',
+                        toEmails: 'counsellor@example.com',
+                        cc: 'Lead, ltv, PM, Roshan',
+                        ccEmails: 'lead@example.com,ltv@example.com,pm@example.com,roshan@example.com',
+                        draftMessage: `Hi [counselor name],\n\nThis is to inform you that student [student ID] [student name] has been absent for 2 consecutive sessions (Sessions 1 and 2) of Tier [Tier, stage].\nCan you please look into this and take the necessary steps?\nBatch Name: [batch ID]\nStudent: [student name] [student ID]\n\nBest regards,\n[PG's Name]`
+                    },
+                    {
+                        id: 'upsell-absent-1-4',
+                        title: 'Absenteeism in upsell batch (sessions 1-4)',
+                        description: 'The student did not join for the first four sessions. NOTE: SPM to ask ushma to mark as course completed and inform LTV',
+                        keywords: ['absent', 'absenteeism', 'upsell', 'sessions 1-4', 'course completed'],
+                        to: 'PM/SPM',
+                        toEmails: 'pm@example.com,spm@example.com',
+                        cc: 'Lead, ltv, PM, Roshan',
+                        ccEmails: 'lead@example.com,ltv@example.com,pm@example.com,roshan@example.com',
+                        draftMessage: `Hi [PM/SPM name],\n\nThis is to inform you that student [student ID] [student name] has been absent for 4 consecutive sessions (Sessions 1 to 4) of Tier [Tier, stage].\nCan you please look into this and take the necessary steps?\nBatch Name: [batch ID]\nStudent: [student name] [student ID]\n\nBest regards,\n[PG's Name]`
+                    }
+                ]
+            },
+            {
+                category: 'Pause related',
+                borderColor: '#F87171', // Red
+                incidents: [
+                    {
+                        id: 'pause-related-parent-informed',
+                        title: 'Parent informed',
+                        description: 'Parents informed in the class that the child will be going on a pause. NOTE: PG should get the info whenever a student joins back after a pause. PG to confirm from the student about the kit (PG to get trained on how to apply for pause on LMS)',
+                        keywords: ['pause', 'parent informed', 'break', 'session hold'],
+                        to: 'jyoti/akash chaudhary',
+                        toEmails: 'jyoti@example.com,akashchaudhary@example.com',
+                        cc: 'Lead, cc-team@moonpreneur.com',
+                        ccEmails: 'lead@example.com,ccteam@moonpreneur.com',
+                        draftMessage: `Hi [Jyoti/Akash],\n\nThe parent of the student [customer ID] [student name] in the batch [batch ID] joined the recent session and informed that [mention the reason] [Date from: To]. Please confirm with the parent again and mark the student as paused.\n\nBest regards,\n[PG's Name]`
+                    }
+                ]
+            },
+            {
+                category: 'Student & Parent Issues',
+                borderColor: '#60A5FA', // Light Blue
+                incidents: [
+                    {
+                        id: 'fast-slow-pace',
+                        title: 'Fast/Slow pace',
+                        description: 'When a student is either too fast or too slow in class.',
+                        keywords: ['pace', 'fast', 'slow', 'student speed', 'bored', 'frustrated', 'not understanding', 'curriculum', 'tier'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Anurag, PM, Lead',
+                        ccEmails: 'anurag@example.com,pm@example.com,lead@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nI have a student in my [Batch ID] batch, [Student Name] [Student ID], who is either moving too fast or too slow. [Briefly explain the situation: e.g., "The student is completing all the activities very quickly and is bored," or "The student is unable to keep up with the pace of the class and is getting frustrated." ]\n\nCan you please look into this and provide some guidance?\n\nThanks.`
+                    },
+                    {
+                        id: 'student-behavior-issues',
+                        title: 'Student Behavior Issues',
+                        description: 'If a student does not fit in the batch due to various reasons. Note: SPM to take further action and tag people based on the situation.',
+                        keywords: ['behavior', 'student issue', 'disruptive', 'inappropriate language', 'refusing to participate'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Anurag, PM, Lead',
+                        ccEmails: 'anurag@example.com,pm@example.com,lead@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nThis is regarding [Student Name] [Student ID] from batch [Batch ID]. The student is consistently displaying disruptive behavior, such as [describe the behavior in detail, e.g., "using inappropriate language," "refusing to participate," "distracting other students"]. I have tried [mention the steps you have taken, e.g., "speaking with the student privately," "setting clear expectations," "informing the parent in the chat box"].\n\nCan you please intervene and suggest the next steps?\n\nThanks.`
+                    },
+                    {
+                        id: 'parents-interaction-with-pgs',
+                        title: "Parents' Interaction with PGs",
+                        description: 'The customer says something, and the PG should not reply with answers, but instead let them know that a team will get in touch and set up a separate meeting. After the session, the PG should drop an email. Note: SPM to analyze the situation and decide who all are supposed to be tagged further.',
+                        keywords: ['parent', 'interaction', 'meeting', 'team connect', 'separate discussion'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM, Anurag',
+                        ccEmails: 'lead@example.com,pm@example.com,anurag@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nA parent of [Student Name] [Student ID] from my batch [Batch ID] wants to have a discussion with me regarding [briefly state the parent's concern]. I have informed the parent that the team will connect with them.\n\nPlease take further action.\n\nThanks.`
+                    },
+                    {
+                        id: 'parent-requests-ptm',
+                        title: 'If the Parent is asking for PTM',
+                        description: 'When a parent directly requests a Parent-Teacher Meeting. SPM will tag and align a Counselor or Senior team member as per the requirement.',
+                        keywords: ['ptm', 'parent teacher meeting', 'request', 'schedule meeting'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nA parent from my batch [Batch ID] is asking for a PTM. [Student Name] [Student ID] is facing [mention the parent's concern].\n\nCould you please schedule a meeting with the parent?\n\nThanks.`
+                    },
+                    {
+                        id: 'parents-direct-email-to-pg',
+                        title: 'If the parents write a direct email to PG',
+                        description: 'If the email is related to assignments or credentials of the platform, the PG can reply directly after a discussion with the lead, while keeping the Lead and PM in CC. Otherwise, the email should be forwarded.',
+                        keywords: ['parent email', 'direct email', 'assignment', 'credentials', 'forward email'],
+                        to: 'PM',
+                        toEmails: 'pm@example.com',
+                        cc: 'Lead, SPM',
+                        ccEmails: 'lead@example.com,spm@example.com',
+                        draftMessage: `Hi [PM Name],\n\nI received an email from a parent of [Student Name] [Student ID] from batch [Batch ID]. They are concerned about [briefly summarize the parent's email]. I have attached the email for your reference.\n\nPlease let me know how to proceed.\n\nThanks.`
+                    },
+                    {
+                        id: 'students-joining-late-ipad-phone-1',
+                        title: 'Students Joining Late with Ipad or Phone (sessions 1-12)',
+                        description: 'For students joining late in the first 12 sessions.',
+                        keywords: ['joining late', 'ipad', 'phone', 'sessions 1-12', 'access issue'],
+                        to: 'Counsellor',
+                        toEmails: 'counsellor@example.com',
+                        cc: 'cc-team alias, PM, SPM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,spm@example.com,lead@example.com',
+                        draftMessage: `Hi [Counsellor Name],\n\nThis is regarding [Student Name] [Student ID] from batch [Batch ID]. The student has been joining the sessions using an iPad/Phone and is unable to [mention the specific issue, e.g., "access the LMS," "use the required software"]. I have already informed the parent about this issue.\n\nCould you please follow up with them to resolve this?\n\nThanks.`
+                    },
+                    {
+                        id: 'students-joining-late-ipad-phone-2',
+                        title: 'Students Joining Late with Ipad or Phone (sessions 13+)',
+                        description: 'For students joining late from the 13th session onwards, or joining with an iPad or Phone.',
+                        keywords: ['joining late', 'ipad', 'phone', 'sessions 13+', 'access issue'],
+                        to: 'Akash chaudhary/jyoti',
+                        toEmails: 'akashchaudhary@example.com,jyoti@example.com',
+                        cc: 'cc-team alias, PM, SPM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,spm@example.com,lead@example.com',
+                        draftMessage: `Hi [Akash Chaudhary/Jyoti Name],\n\nThis is regarding [Student Name] [Student ID] from batch [Batch ID]. The student has been joining the sessions using an iPad/Phone and is unable to [mention the specific issue, e.g., "access the LMS," "use the required software"]. I have already informed the parent about this issue.\n\nCould you please follow up with them to resolve this?\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Kit & Shipment Issues',
+                borderColor: '#F97316', // Orange
+                incidents: [
+                    {
+                        id: 'address-verification',
+                        title: 'Address verification',
+                        description: 'Not receiving OTP, changing address, parents not available in the session for confirmation, all the verification sessions are completed and still the address remains unconfirmed, paused students join the batch and we cannot verify the address due to the verification not being configured. Note: SPM to coordinate with the CC team or ECOM team to get the verification done. Please raise a ticket to vivek.j@moonpreneur.com for external address verification. Collect the address in the class and mention it in the ticket along with the batch ID and kit name (Confirm address tag resets when the batch changes or the wrong status is visible).',
+                        keywords: ['address', 'verification', 'otp', 'change address', 'unconfirmed', 'kit delivery'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM, chetan',
+                        ccEmails: 'lead@example.com,pm@example.com,chetan@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nCould you please verify the shipping address for [Student Name] [Student ID] in batch [Batch ID]? The address is [provide the full address].\n\nPlease let me know if there are any discrepancies.\n\nThanks.`
+                    },
+                    {
+                        id: 'shipment-issues-entire-kit',
+                        title: 'Shipment Issues (entire kit)',
+                        description: 'The student did not receive the kit, and the unboxing session is approaching or has passed. Note: Ask for the tracking details.',
+                        keywords: ['shipment', 'kit', 'not received', 'unboxing session', 'tracking details'],
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon Name],\n\nThis is to inform you that the kit for [Student Name] [Student ID] from batch [Batch ID] has not been delivered yet. The student needs the kit by [date].\n\nCould you please look into this urgently and provide an update on the shipment status?\n\nThanks.`
+                    },
+                    {
+                        id: 'shipment-issues-order-not-placed',
+                        title: 'Shipment Issues (order not placed)',
+                        description: 'The student did not receive the kit, and the unboxing session is approaching or has passed. The ECOM team says that the order is not placed. Note: SPM to initiate the shipment on an urgent basis. PG to collect the address promptly within the session.',
+                        keywords: ['shipment', 'order not placed', 'ecom team', 'urgent shipment'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nThis is to inform you that the kit for [Student Name] [Student ID] from batch [Batch ID] has not been delivered yet. The ECOM team has stated that the order was not placed. I have collected the address: [provide the full address].\n\nCould you please initiate the shipment on an urgent basis?\n\nThanks.`
+                    },
+                    {
+                        id: 'kits-held-at-courier-office',
+                        title: 'Kits held at courier office (delays)',
+                        description: 'The tracking link shows Kits held at courier office that is causing delay. Note: We can offer makeup sessions for practical testing of the missed session without a kit. (Only SPM to approve this).',
+                        keywords: ['kit', 'held', 'courier', 'delays', 'tracking', 'makeup sessions'],
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon],\n\nThe kit for [Student Name] [Student ID] from batch [Batch ID] is being held at the courier office, causing delays.\n\nCould you please look into this and provide an update?\n\nThanks.`
+                    },
+                    {
+                        id: 'wrong-kit-address-duplicate',
+                        title: 'Wrong kit/address/duplicate kits',
+                        description: 'Wrong kit shipped, kit sent to the wrong address, or duplicate kits. Note: PM/SPM to take action and get the right shipment initiated. Take help from the CC team if needed.',
+                        keywords: ['wrong kit', 'wrong address', 'duplicate kit', 'shipment initiated'],
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon Name],\n\nThis is to inform you that [a wrong kit was shipped/the kit was sent to the wrong address/a duplicate kit was received] for [Student Name] [Student ID] from batch [Batch ID].\n\nCould you please take the necessary action to rectify this?\n\nThanks.`
+                    },
+                    {
+                        id: 'kit-not-delivered-in-batch',
+                        title: 'Kit not delivered in a complete batch',
+                        description: 'None of the students in a batch has received the kit, and the kit unboxing session is approaching. Note: SPM to initiate the delivery and check the fault. Also, enable the revision/buffer session.',
+                        keywords: ['kit not delivered', 'batch issue', 'unboxing', 'revision session'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nThe kits for my batch [Batch ID] have not been delivered. Could you please initiate the delivery and check the fault? I would also like to request that a revision/buffer session be enabled.\n\nThanks.`
+                    },
+                    {
+                        id: 'kit-delivered-parent-denies',
+                        title: 'Kit delivered, parent denies',
+                        description: 'The status in the tracking link shows the kit is delivered, but the customer is saying that they have not received any kit. Note: SPM to discuss this with a counselor or CC team, and discuss this with the customer, and investigate the problem with Syed/Vivek.',
+                        keywords: ['kit delivered', 'parent denies', 'tracking link', 'investigate', 'counselor'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM',
+                        ccEmails: 'lead@example.com,pm@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nThe tracking shows that the kit for [Student Name] [Student ID] from batch [Batch ID] has been delivered, but the parent has informed me that they have not received it.\n\nCould you please look into this and discuss it with the parent?\n\nThanks.`
+                    },
+                    {
+                        id: 'parent-requested-shipment-hold',
+                        title: 'Parent requested shipment hold',
+                        description: 'Parents requesting to hold the shipment for some time (travelling).',
+                        keywords: ['shipment hold', 'parent request', 'travelling'],
+                        to: 'Syed, Vivek Jadon',
+                        toEmails: 'syed@example.com,vivekjadon@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Syed/Vivek Jadon Name],\n\nA parent from my batch [Batch ID] has requested to hold the shipment of the kit for [Student Name] [Student ID] as they are travelling.\n\nCould you please hold the shipment until [date]?\n\nThanks.`
+                    },
+                    {
+                        id: 'kit-on-hold-payment-issues',
+                        title: 'Kit on hold due to payment issues',
+                        description: 'Kit is kept on hold due to payment issues like customer has not paid for the enrolled course.',
+                        keywords: ['kit on hold', 'payment issues', 'enrolled course'],
+                        to: 'Akansha, counsellor',
+                        toEmails: 'akansha@example.com,counsellor@example.com',
+                        cc: 'Lead, PM, SPM',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi [Akansha/Counsellor Name],\n\nThe kit for [Student Name] [Student ID] from batch [Batch ID] is on hold due to a payment issue.\n\nCould you please look into this and get it resolved?\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Kit Component Issues',
+                borderColor: '#A78BFA', // Purple
+                incidents: [
+                    {
+                        id: 'component-not-working',
+                        title: 'Component not working',
+                        description: 'If any component in the kit is not working, physically damaged, has factory issues, malfunctioning including the microcontroller, our internal boards, off-the-shelf components (LEDS, POT, SENSORS, other modules), or problems related to batteries (RF, IR remote, and car kit batteries). Note: Debugging team to decide on sessions, replacement, or student consultation.',
+                        keywords: ['component not working', 'physically damaged', 'microcontroller', 'batteries', 'replacement'],
+                        to: 'Debugging alias',
+                        toEmails: 'debugging@example.com',
+                        cc: 'PM, Lead, SPM',
+                        ccEmails: 'pm@example.com,lead@example.com,spm@example.com',
+                        draftMessage: `Hi Debugging Team,\n\nI'm reporting an issue with the kit for [Student Name] [Student ID] in batch [Batch ID]. The component [name of the component] is either [explain the issue, e.g., "broken," "not working," "incorrect"]. The student is unable to proceed with the session.\n\nCould you please arrange for a replacement?\n\nThanks.`
+                    },
+                    {
+                        id: 'components-missing-unboxing',
+                        title: 'Components missing during the kit unboxing session',
+                        description: 'Some components are missing from the kit during the unboxing session. Note: PM/SPM to verify and approve the shipment of missing components.',
+                        keywords: ['missing components', 'unboxing session', 'kit issues', 'approve shipment'],
+                        to: 'syed, vivek',
+                        toEmails: 'syed@example.com,vivek@example.com',
+                        cc: 'SPM, PM, Lead, Saurabh',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,saurabh@example.com',
+                        draftMessage: `Hi [syed/vivek Name],\n\nDuring the unboxing session for [Student Name] [Student ID] from batch [Batch ID], we noticed that the following components were missing from the kit [Serial number of the kit]: [list the missing components].\n\nCould you please arrange for these to be shipped as soon as possible?\n\nThanks.`
+                    },
+                    {
+                        id: 'lost-the-components',
+                        title: 'Lost the components',
+                        description: 'A student has lost some components of their kit, or a customer claims a component was missing, but you know it was in the kit unboxing session. Note: Check the session recording to verify.',
+                        keywords: ['lost components', 'missing', 'kit', 'session recording', 'replacement'],
+                        to: 'PM',
+                        toEmails: 'pm@example.com',
+                        cc: 'SPM, Lead, cc-team',
+                        ccEmails: 'spm@example.com,lead@example.com,ccteam@example.com',
+                        draftMessage: `Hi [PM Name],\n\nA student, [Student Name] [Student ID], from batch [Batch ID], has informed me that they have lost the following components: [list the lost components]. I have verified the kit unboxing session recording, and the component is verified by the student.\n\nCan you please guide me on the process for a replacement?\n\nThanks.`
+                    },
+                    {
+                        id: 'component-link-not-ordered',
+                        title: 'Link provided for component, but Cx didn’t order',
+                        description: 'We provided the link to order the component to the customer, but the customer is not ordering, and the child suffers. Note: Ask the CC team rep to call the customer and remind them to order the component. PG can also ask the child to remind their parents to order the component whose link has already been shared by the CC team or PG previously via email.',
+                        keywords: ['link provided', "customer didn't order", 'component', 'reminder call'],
+                        to: 'Jyoti or Akash',
+                        toEmails: 'jyoti@example.com,akash@example.com',
+                        cc: 'SPM, PM, Lead, CC team alias',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,ccteam@example.com',
+                        draftMessage: `Hi [Jyoti or Akash's name],\n\nA student [student name] [student ID] from my batch [Batch ID] is suffering because they have not ordered a replacement for a lost component. We have already provided the link to the customer.\n\nCould you please have the CC team representative call the customer and remind them to order the component?\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'LMS & Alignment Issues',
+                borderColor: '#60A5FA', // Light Blue
+                incidents: [
+                    {
+                        id: 'batch-not-visible',
+                        title: 'Batch not visible in dashboard',
+                        description: 'The batch is not visible in your dashboard.',
+                        keywords: ['batch not visible', 'dashboard', 'lms issue'],
+                        to: 'Roshan',
+                        toEmails: 'roshan@example.com',
+                        cc: 'MIS, Ushma, Lead',
+                        ccEmails: 'mis@example.com,ushma@example.com,lead@example.com',
+                        draftMessage: `Hi Roshan,\n\nI'm facing an issue with the LMS in my batch [Batch ID]. The batch is not visible to me.\n\nCould you please look into this?\n\nThanks.`
+                    },
+                    {
+                        id: 'student-info-missing-incorrect',
+                        title: 'Student information missing/incorrect',
+                        description: "A student's name is not in the PG's LMS, their email or phone number needs an update, a wrong name is listed in the LMS, or the LMS shows the wrong status for the child.",
+                        keywords: ['student information missing', 'incorrect info', 'wrong name', 'update email', 'wrong status'],
+                        to: 'Ushma',
+                        toEmails: 'ushma@example.com',
+                        cc: 'MIS, Roshan, Lead',
+                        ccEmails: 'mis@example.com,roshan@example.com,lead@example.com',
+                        draftMessage: `Hi Ushma,\n\nI'm facing an issue with the LMS in my batch [Batch ID] regarding [Student Name] [Student ID]. [Describe the issue, e.g., "The student's name is incorrect in the LMS," "I need to update their email address," "The batch status is incorrect."].\n\nCould you please correct this?\n\nThanks.`
+                    },
+                    {
+                        id: 'student-joins-direct-link',
+                        title: 'Student joins from a direct link',
+                        description: 'A student is joining from a direct link or is not able to log in and does not know their credentials.',
+                        keywords: ['direct link', 'login issue', 'credentials', 'lms access'],
+                        to: 'Akash Chaudhary or Jyoti',
+                        toEmails: 'akashchaudhary@example.com,jyoti@example.com',
+                        cc: 'Lead, cc-team@moonpreneur.com',
+                        ccEmails: 'lead@example.com,ccteam@moonpreneur.com',
+                        draftMessage: `Hi [Akash Chaudhary or Jyoti Name],\n\nThis is regarding [Student Name] [Student ID] from batch [Batch ID]. The student is unable to log in and does not know their credentials.\n\nCould you please assist with this?\n\nThanks.`
+                    },
+                    {
+                        id: 'student-help-lms-navigation',
+                        title: 'Students need help with LMS navigation',
+                        description: 'A student is facing difficulty navigating the LMS like finding assignments or introduction files, etc.',
+                        keywords: ['lms navigation', 'finding assignments', 'lms difficulty'],
+                        to: 'Akash Chaudhary or Jyoti',
+                        toEmails: 'akashchaudhary@example.com,jyoti@example.com',
+                        cc: 'Lead, cc-team@moonpreneur.com',
+                        ccEmails: 'lead@example.com,ccteam@moonpreneur.com',
+                        draftMessage: `Hi [Akash Chaudhary or Jyoti Name],\n\nA student[student name] [Student ID] from my batch [Batch ID] is facing difficulty navigating the LMS.\n\nCould you please reach out to the customer and help them out?\n\nThanks.`
+                    },
+                    {
+                        id: 'student-misalignment',
+                        title: 'Student Misalignment',
+                        description: 'A student has been placed in the wrong tier, is misaligned after coming from a pause (wrong tier/wrong session number), or needs a downgrade/upgrade. The above points are also valid for upsell-related cases.',
+                        keywords: ['student misalignment', 'wrong tier', 'wrong session', 'downgrade', 'upgrade'],
+                        to: 'Roshan',
+                        toEmails: 'roshan@example.com',
+                        cc: 'Lead, PM, SPM, Anurag',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com,anurag@example.com',
+                        draftMessage: `Hi Roshan,\n\nI believe [Student Name] [Student ID] is misaligned to my batch [Batch ID]. The student is currently in [describe their actual level/course] and should be in [mention the correct batch/level].\n\nCould you please rectify this?\n\nThanks.`
+                    },
+                    {
+                        id: 'session-number-mismatch',
+                        title: 'Session Number Mismatch',
+                        description: "The student is in the correct tier, but the wrong session number / All of a sudden your session count doesn't match with the topic that you are teaching. Note: Please mention the correct session number for the next class and ask the team to do the corrections. PG to email the assignments to the customer.",
+                        keywords: ['session number mismatch', 'wrong session', 'session count'],
+                        to: 'Ushma',
+                        toEmails: 'ushma@example.com',
+                        cc: 'Lead, PM, MISOPS alias, Roshan',
+                        ccEmails: 'lead@example.com,pm@example.com,misops@example.com,roshan@example.com',
+                        draftMessage: `Hi Ushma,\n\nI have a session number mismatch issue in my batch [Batch ID]. The current session number in the LMS is [current session number], but it should be [correct session number].\n\nCould you please correct this?\n\nThanks.`
+                    },
+                    {
+                        id: 'removal-of-substitution-batches',
+                        title: 'Removal of substitution batches',
+                        description: 'After the substitution sessions are done and you want to clear your dashboard',
+                        keywords: ['remove batches', 'substitution', 'clear dashboard'],
+                        to: 'MISops',
+                        toEmails: 'misops@example.com',
+                        cc: 'Ushma, Lead',
+                        ccEmails: 'ushma@example.com,lead@example.com',
+                        draftMessage: `Hi MIS team,\n\nKindly remove the following substitution batches from my dashboard. [Batch IDs]\n\nThanks.`
+                    },
+                    {
+                        id: 'recording-upload-issues',
+                        title: 'Recording Upload Issues',
+                        description: 'The recording is not being uploaded in the batch. Note: Ask the PG if he/she has checked the "Recording upload" in the recordings, and if it is still not working, send a mail to the support team.',
+                        keywords: ['recording upload', 'not uploaded', 'lms recording', 'support team'],
+                        to: 'Tulsi',
+                        toEmails: 'tulsi@example.com',
+                        cc: 'MISOPS Alias, Lead',
+                        ccEmails: 'misops@example.com,lead@example.com',
+                        draftMessage: `Hi Tulsi,\n\nThe recording for my batch [Batch ID] session [session number] is not visible on the LMS. I have tried to [mention steps taken, e.g., "re-sync the recording"].\n\nCould you please look into this and ensure the recording is uploaded?\n\nThanks.`
+                    },
+                    {
+                        id: 'session-recording-trimming-requests',
+                        title: 'Session Recording Trimming Requests',
+                        description: 'Request to trim a session recording.',
+                        keywords: ['session recording', 'trimming', 'edit recording'],
+                        to: 'Sessionreview alias',
+                        toEmails: 'sessionreview@example.com',
+                        cc: 'Tulsi, Lead, PM, SPM',
+                        ccEmails: 'tulsi@example.com,lead@example.com,pm@example.com,spm@example.com',
+                        draftMessage: `Hi Sessionreview team,\n\nCould you please trim the recording for batch [Batch ID], session [session number]? I need to trim the section from [timestamp start] to [timestamp end][Mention the reason].\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Batch Merge',
+                borderColor: '#FDE68A', // Yellow
+                incidents: [
+                    {
+                        id: 'batch-merge-requests',
+                        title: 'Batch Merge Requests',
+                        description: 'In the case of a single student left in a batch.',
+                        keywords: ['batch merge', 'single student'],
+                        to: 'Roshan',
+                        toEmails: 'roshan@example.com',
+                        cc: 'Lead, PM, SPM, Anurag',
+                        ccEmails: 'lead@example.com,pm@example.com,spm@example.com,anurag@example.com',
+                        draftMessage: `Hi Roshan,\n\nI would like to request a batch merge for my batch [Batch ID] as there is only one active student[student name][student ID] left in this batch.\n\nCould you please look into this and take the necessary action?\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Leave Management',
+                borderColor: '#EC4899', // Pink
+                incidents: [
+                    {
+                        id: 'regular-leave',
+                        title: 'Regular Leave',
+                        description: 'A PG wants to apply and seek approval for leaves, information about the substitution batches, an extension of leave, or emails regarding LOPs and exams (datesheets).',
+                        keywords: ['regular leave', 'apply leave', 'substitution', 'lop', 'exams'],
+                        to: 'Substitution alias',
+                        toEmails: 'substitution@example.com',
+                        cc: 'SPM, PM, Lead, Anurag',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,anurag@example.com',
+                        draftMessage: `Hi Substitution team,\n\nI would like to request leave on [Mention date range]. [Provide the reason for the leave]. [Mention the specific details of all the batches that fall within that duration, along with batch IDs, and mention if a student is slow or fast any facing any concern, like doesn’t have a kit, etc.].\n\nThanks.`
+                    },
+                    {
+                        id: 'maternity-paternity-leave',
+                        title: 'Maternity/Paternity Leave',
+                        description: 'Maternity/Paternity leave.',
+                        keywords: ['maternity leave', 'paternity leave', 'long leave'],
+                        to: 'Prachi, Simardeep',
+                        toEmails: 'prachi@example.com,simardeep@example.com',
+                        cc: 'SPM, PM, Lead, Anurag, substitution alias',
+                        ccEmails: 'spm@example.com,pm@example.com,lead@example.com,anurag@example.com,substitution@example.com',
+                        draftMessage: `Hi [Prachi/Simardeep Name],\n\nI would like to request maternity/paternity leave starting on [date].\n\nPlease let me know the next steps.\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Absenteeism',
+                borderColor: '#DC2626', // A darker red
+                incidents: [
+                    {
+                        id: 'absenteeism-protocol',
+                        title: 'Absenteeism Protocol',
+                        description: 'Protocol to follow for student absenteeism. For sessions 1 to 5, no emails for absenteeism. After session 5, if only one session is missed, no action is required. If 2 consecutive sessions are missed (e.g., 6 & 7), a ticket should be raised on the LMS. The follow-up frequency is every alternate day before the 3rd missed session, 2 follow-ups if the 3rd session is missed (Session 8), and 1 follow-up if the 4th session is missed (Session 9). After that, no further follow-ups are needed, and it should be escalated to the PM. Note: The ticket should be assigned to Armughan Qazi if your SPM is ANITA and Nishant Vijayvargiya if your SPM is Akshay Tambe.',
+                        keywords: ['absenteeism protocol', 'absent', 'missed sessions', 'escalation', 'follow-up'],
+                        to: 'PM',
+                        toEmails: 'pm@example.com',
+                        cc: '',
+                        ccEmails: '',
+                        draftMessage: `Hi [PM Name],\n\nStudent [Student Name] [Student ID] from batch [Batch ID] has been absent for [number] consecutive sessions. I have followed the absenteeism protocol and now need to escalate this. The student's SPM is [SPM Name].\n\nCould you please follow up with the parent to find out the reason for absenteeism?\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Unknown Session Queries',
+                borderColor: '#2DD4BF', // Teal
+                incidents: [
+                    {
+                        id: 'unknown-session-queries',
+                        title: 'Unknown Session Queries',
+                        description: 'A customer discusses unfamiliar topics in a session such as Summer camp, Moonbattle, MoonCampaingns Maths, or a different program (other than Robotics).',
+                        keywords: ['unknown session', 'unfamiliar topics', 'summer camp', 'moonbattle', 'mooncampaings'],
+                        to: 'Jyoti, Akash chaudhary',
+                        toEmails: 'jyoti@example.com,akashchaudhary@example.com',
+                        cc: 'cc-team alias, PM, SPM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,spm@example.com,lead@example.com',
+                        draftMessage: `Hi [Jyoti/Akash Chaudhary Name],\n\nParent of [student ID] [student name] is asking about [briefly state the parent's query, e.g., "Summer camp," "Moonbattle," etc.].\n\nCould you please reach out to them and provide some clarity on this?\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Incident Reporting',
+                borderColor: '#6B7280', // Gray
+                incidents: [
+                    {
+                        id: 'incident-reporting',
+                        title: 'Incident Reporting',
+                        description: 'To report an incident in class in case you are not sure how to react or respond to that case.',
+                        keywords: ['incident reporting', 'report incident', 'how to respond', 'not sure'],
+                        to: 'SPM',
+                        toEmails: 'spm@example.com',
+                        cc: 'Lead, PM, Anurag, session review alias',
+                        ccEmails: 'lead@example.com,pm@example.com,anurag@example.com,sessionreview@example.com',
+                        draftMessage: `Hi [SPM Name],\n\nAn incident has occurred in my batch [Batch ID] involving [Student Name] [Student ID]. [Provide a detailed description of the incident]. I am not sure how to handle this.\n\nCould you please guide me on the next steps?\n\nThanks.`
+                    }
+                ]
+            },
+            {
+                category: 'Show and Tell Information',
+                borderColor: '#10B981', // Green
+                incidents: [
+                    {
+                        id: 'show-and-tell-information',
+                        title: 'Show and Tell Information',
+                        description: 'Show and tell good performances or edit in the Mooncampaigns.',
+                        keywords: ['show and tell', 'good performance', 'mooncampaigns', 'edit'],
+                        to: 'Riti',
+                        toEmails: 'riti@example.com',
+                        cc: 'cc-team, PM, Lead',
+                        ccEmails: 'ccteam@example.com,pm@example.com,lead@example.com',
+                        draftMessage: `Hi Riti,\n\nIn the recent 'Show and Tell' session for my batch [Batch ID], the student [student name][student ID] performed really well, you might want to have a look at this.\n\nThanks.`
+                    }
+                ]
+            }
+        ];
+
+        // Utility: Copy text to clipboard and show a message
+        const messageBox = document.getElementById('messageBox');
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            // Show confirmation message
+            messageBox.classList.remove('opacity-0', 'translate-y-full');
+            messageBox.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                messageBox.classList.remove('opacity-100', 'translate-y-0');
+                messageBox.classList.add('opacity-0', 'translate-y-full');
+            }, 2500);
         }
-      ],
-      "Pause related": [
-        {
-          title: "Parent Informed Pause",
-          description: "Handle parent request to pause classes.",
-          to: "support@example.com",
-          cc: "",
-          subject: "Pause Request",
-          body: "Dear Parent, we acknowledge your request to pause classes..."
+
+        // Utility: Compose email via Gmail
+        function composeEmail(to, cc, subject, body) {
+            const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&cc=${encodeURIComponent(cc)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink, '_blank');
         }
-      ]
-    };
 
-    // Render sidebar categories
-    const sidebarCategories = document.getElementById('sidebarCategories');
-    const incidentContainer = document.getElementById('incidentContainer');
+        // Create category button with summary of incidents
+        function createCategoryCardButton(categoryData) {
+            const cardButton = document.createElement('div');
+            cardButton.classList.add('category-card-button', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg', 'flex', 'items-center', 'justify-between');
+            cardButton.style.borderColor = categoryData.borderColor;
+            cardButton.setAttribute('data-category', categoryData.category.toLowerCase().replace(/\s+/g, '-'));
+            cardButton.innerHTML = `
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold">${categoryData.category}</h2>
+                    <ul class="text-gray-600 text-sm mt-2 space-y-1">
+                        ${categoryData.incidents.map(inc => `<li>${inc.title}</li>`).join('')}
+                    </ul>
+                </div>
+                <svg class="caret-icon w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            `;
+            return cardButton;
+        }
 
-    function renderIncidents() {
-      sidebarCategories.innerHTML = '';
-      incidentContainer.innerHTML = '';
+        // Create individual incident card element
+        function createIncidentCard(incident, borderColor) {
+            const card = document.createElement('div');
+            card.classList.add('incident-card', 'bg-white', 'p-6', 'rounded-xl', 'shadow-lg');
+            card.setAttribute('data-incident-id', incident.id);
+            if (borderColor) {
+                card.style.borderLeftColor = borderColor;
+            }
+            card.innerHTML = `
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">${incident.title}</h3>
+                <p class="text-gray-600 mb-4">${incident.description}</p>
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <p class="font-semibold text-gray-700 mb-2">To: <span class="font-normal text-gray-600">${incident.to}</span></p>
+                    <p class="font-semibold text-gray-700">CC: <span class="font-normal text-gray-600">${incident.cc}</span></p>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="copy-btn w-full text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-all bg-blue-500 hover:bg-blue-600">Copy Draft Message</button>
+                    <button class="email-btn w-full text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-all bg-red-500 hover:bg-red-600">Compose Email</button>
+                </div>
+            `;
+            // Attach click handlers for copy and compose email
+            const copyButton = card.querySelector('.copy-btn');
+            const emailButton = card.querySelector('.email-btn');
+            const subjectLine = `${incident.title}: [batch ID]`;
+            copyButton.addEventListener('click', () => copyToClipboard(incident.draftMessage));
+            emailButton.addEventListener('click', () => composeEmail(incident.toEmails, incident.ccEmails, subjectLine, incident.draftMessage));
+            return card;
+        }
 
-      Object.keys(incidentsData).forEach(category => {
-        // Sidebar item
-        const li = document.createElement('li');
-        li.textContent = category;
-        li.className = 'cursor-pointer text-blue-600 hover:underline';
-        li.onclick = () => document.getElementById(`cat-${category}`).scrollIntoView({behavior:'smooth'});
-        sidebarCategories.appendChild(li);
+        // Render the sidebar menu with links to each category
+        function renderSidebarMenu() {
+            const sidebarMenu = document.getElementById('sidebar-menu');
+            sidebarMenu.innerHTML = '';
+            incidentsData.forEach(categoryData => {
+                const li = document.createElement('li');
+                const id = categoryData.category.toLowerCase().replace(/\s+/g, '-');
+                li.innerHTML = `<a href="#${id}" class="block py-2 px-4 rounded-lg sidebar-link" style="color: ${categoryData.borderColor}">${categoryData.category}</a>`;
+                sidebarMenu.appendChild(li);
+                li.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetElement = document.getElementById(id);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    sidebar.classList.remove('open');
+                    document.body.style.paddingLeft = '0';
+                });
+            });
+        }
 
-        // Category block
-        const div = document.createElement('div');
-        div.id = `cat-${category}`;
-        div.className = 'bg-white p-4 rounded-xl shadow';
+        // Render all categories and their incident cards
+        function renderIncidents(filteredData = null) {
+            const displayData = filteredData || incidentsData;
+            const incidentsContainer = document.getElementById('incidentsContainer');
+            incidentsContainer.innerHTML = '';
+            displayData.forEach(categoryData => {
+                const categoryWrapper = document.createElement('div');
+                categoryWrapper.classList.add('category-container', 'mb-8');
+                categoryWrapper.id = categoryData.category.toLowerCase().replace(/\s+/g, '-');
+                // Create category button
+                const categoryCardButton = createCategoryCardButton(categoryData);
+                // Create container for the cards
+                const cardsContainer = document.createElement('div');
+                cardsContainer.classList.add('cards-container', 'p-6', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8');
+                cardsContainer.style.display = 'none';
+                cardsContainer.setAttribute('data-category', categoryData.category.toLowerCase().replace(/\s+/g, '-'));
+                // Append incident cards
+                categoryData.incidents.forEach(incident => {
+                    const card = createIncidentCard(incident, categoryData.borderColor);
+                    cardsContainer.appendChild(card);
+                });
+                categoryWrapper.appendChild(categoryCardButton);
+                categoryWrapper.appendChild(cardsContainer);
+                incidentsContainer.appendChild(categoryWrapper);
+                // Click event to expand/collapse cards
+                categoryCardButton.addEventListener('click', () => {
+                    const isOpen = cardsContainer.style.display === 'grid';
+                    // Close all categories
+                    document.querySelectorAll('.cards-container').forEach(container => {
+                        container.style.display = 'none';
+                    });
+                    document.querySelectorAll('.caret-icon').forEach(icon => {
+                        icon.classList.remove('rotate');
+                    });
+                    document.querySelectorAll('.category-card-button').forEach(btn => {
+                        btn.classList.remove('highlighted-category');
+                        btn.classList.remove('faded-category');
+                    });
+                    if (!isOpen) {
+                        cardsContainer.style.display = 'grid';
+                        categoryCardButton.querySelector('.caret-icon').classList.add('rotate');
+                        categoryCardButton.classList.add('highlighted-category');
+                        document.querySelectorAll('.category-card-button').forEach(btn => {
+                            if (btn !== categoryCardButton) {
+                                btn.classList.add('faded-category');
+                            }
+                        });
+                    }
+                });
+            });
+        }
 
-        const h3 = document.createElement('h3');
-        h3.className = 'text-xl font-semibold mb-2';
-        h3.textContent = category;
-        div.appendChild(h3);
-
-        incidentsData[category].forEach(incident => {
-          const card = document.createElement('div');
-          card.className = 'border rounded p-3 mb-3';
-
-          const title = document.createElement('h4');
-          title.className = 'font-bold';
-          title.textContent = incident.title;
-
-          const desc = document.createElement('p');
-          desc.className = 'text-gray-600';
-          desc.textContent = incident.description;
-
-          const btnCopy = document.createElement('button');
-          btnCopy.className = 'bg-gray-200 px-2 py-1 rounded mr-2';
-          btnCopy.textContent = 'Copy Draft Message';
-          btnCopy.onclick = () => copyToClipboard(incident.body);
-
-          const btnEmail = document.createElement('a');
-          btnEmail.href = `mailto:${incident.to}?cc=${incident.cc}&subject=${encodeURIComponent(incident.subject)}&body=${encodeURIComponent(incident.body)}`;
-          btnEmail.className = 'bg-blue-600 text-white px-2 py-1 rounded';
-          btnEmail.textContent = 'Compose Email';
-
-          card.appendChild(title);
-          card.appendChild(desc);
-          card.appendChild(btnCopy);
-          card.appendChild(btnEmail);
-          div.appendChild(card);
+        // Scroll buttons functionality
+        const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        function toggleScrollButtons() {
+            const doc = document.documentElement;
+            const isAtTop = doc.scrollTop === 0;
+            const isAtBottom = (window.innerHeight + window.scrollY) >= doc.scrollHeight;
+            if (isAtTop) {
+                scrollToTopBtn.style.opacity = '0';
+                scrollToTopBtn.classList.add('hidden');
+            } else {
+                scrollToTopBtn.style.opacity = '1';
+                scrollToTopBtn.classList.remove('hidden');
+            }
+            if (isAtBottom) {
+                scrollToBottomBtn.style.opacity = '0';
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                scrollToBottomBtn.style.opacity = '1';
+                scrollToBottomBtn.classList.remove('hidden');
+            }
+        }
+        window.addEventListener('scroll', toggleScrollButtons);
+        window.addEventListener('resize', toggleScrollButtons);
+        scrollToBottomBtn.addEventListener('click', () => {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        });
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        incidentContainer.appendChild(div);
-      });
-    }
+        // Sidebar toggle for smaller devices
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const sidebar = document.getElementById('sidebar');
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                document.body.style.paddingLeft = '200px';
+            } else {
+                document.body.style.paddingLeft = '0';
+            }
+        });
 
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        const popup = document.getElementById('copySuccess');
-        popup.classList.remove('hidden');
-        setTimeout(() => popup.classList.add('hidden'), 2000);
-      });
-    }
+        // AI search integration
+        const apiKey = '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';
+        async function performAISearch(query) {
+            const endpoint = 'https://api.openai.com/v1/completions';
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'text-davinci-003',
+                        prompt: `You are an assistant helping PGs search for incident management guidance. Use the following incident titles and descriptions to identify which incidents match the query. If multiple incidents match, list them separated by new lines with format "<Category>: <Title>". Here are the incidents: ${incidentsData.map(cat => cat.incidents.map(inc => `${cat.category}: ${inc.title} - ${inc.description}`).join('\n')).join('\n')}\n\nQuery: ${query}\n\nRelevant incidents:`,
+                        max_tokens: 150,
+                        temperature: 0.3
+                    })
+                });
+                const data = await response.json();
+                if (data.choices && data.choices.length > 0) {
+                    return data.choices[0].text.trim();
+                }
+                return '';
+            } catch (error) {
+                console.error('AI search error:', error);
+                return '';
+            }
+        }
 
-    // Scroll buttons
-    const scrollTopBtn = document.getElementById('scrollTopBtn');
-    const scrollBottomBtn = document.getElementById('scrollBottomBtn');
+        // Display AI search results
+        function displaySearchResults(resultsText) {
+            const searchResultsContainer = document.getElementById('searchResults');
+            searchResultsContainer.innerHTML = '';
+            if (!resultsText) {
+                searchResultsContainer.innerHTML = '<p class="text-gray-500">No relevant incidents found. Please try a different query.</p>';
+                return;
+            }
+            const lines = resultsText.split('\n').map(line => line.trim()).filter(line => line);
+            lines.forEach(line => {
+                const div = document.createElement('div');
+                div.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+                div.textContent = line;
+                searchResultsContainer.appendChild(div);
+            });
+        }
 
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        scrollTopBtn.classList.remove('hidden');
-      } else {
-        scrollTopBtn.classList.add('hidden');
-      }
-      if (window.innerHeight + window.scrollY < document.body.offsetHeight - 300) {
-        scrollBottomBtn.classList.remove('hidden');
-      } else {
-        scrollBottomBtn.classList.add('hidden');
-      }
-    });
+        // Handle search input and call AI
+        const searchInput = document.getElementById('incidentSearch');
+        searchInput.addEventListener('input', async (e) => {
+            const term = e.target.value.trim();
+            const searchResultsContainer = document.getElementById('searchResults');
+            if (term === '') {
+                searchResultsContainer.innerHTML = '';
+                renderIncidents();
+                return;
+            }
+            // Hide category view while searching
+            document.getElementById('incidentsContainer').innerHTML = '';
+            searchResultsContainer.innerHTML = '';
+            // Show loading spinner
+            searchLoading.classList.remove('hidden');
+            const results = await performAISearch(term);
+            searchLoading.classList.add('hidden');
+            displaySearchResults(results);
+        });
 
-    scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-    scrollBottomBtn.onclick = () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-
-    renderIncidents();
-  </script>
+        // Initial render on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIncidents();
+            renderSidebarMenu();
+            toggleScrollButtons();
+        });
+    </script>
 </body>
 </html>
