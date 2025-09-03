@@ -104,6 +104,14 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Custom styles for Botpress Webchat */
+        #bp-web-widget {
+            position: fixed;
+            bottom: 100px; /* Adjust the distance from the bottom to avoid overlap */
+            right: 20px; /* Distance from the right edge */
+            z-index: 1000; /* Ensure it's visible above other content */
+        }
+
         /* Scroll to bottom button styling */
         #scrollToBottomBtn {
             position: fixed;
@@ -1156,4 +1164,5 @@
     <script src="https://files.bpcontent.cloud/2025/08/18/14/20250818143920-VDJ9Z968.js" defer></script>
 </body>
 </html>
+
 
